@@ -1,0 +1,37 @@
+# Ignore compiled Python files
+*.pyc
+__pycache__/
+
+# Ignore the virtual environment directory
+.venv/
+
+# Ignore user-specific IDE and editor files
+.vscode/
+.idea/
+
+# Ignore all folders startin with dot in their names
+.cog_dari_rizky/
+
+# Ignore log files
+*.log
+
+# Ignore configuration files with sensitive information
+config.ini
+
+# Ignore Pylint configuration file
+.pylintrc
+
+# Ignore generated documentation
+docs/
+
+# Ignore dependency management files
+pipfile.lock
+poetry.lock
+
+# Ignore miscellaneous temporary files
+*.tmp
+*.bak
+*.off
+
+# Ignore any other files or directories specific to your project
+# ...
