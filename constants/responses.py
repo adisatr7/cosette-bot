@@ -173,7 +173,7 @@ PAUSING = [
 ]
 
 # List of responses to say when user calls /pause but the music is already paused
-MUSIC_ALREADY_PAUSED = [
+SONG_ALREADY_PAUSED = [
     "⏸️  Hey there, the music is already taking a break. Are you trying to give it an extended vacation?",
     "⏸️  Oh my whiskers! The music is already enjoying its pause. It wonders if you're trying to test its patience.",
     "⏸️  Uhm, the music is peacefully napping in pause mode.",
@@ -217,12 +217,51 @@ RESUMING_SONG = [
     "A momentary pause just makes you appreciate the music even more. Let's continue the music!"
 ]
 
-# TODO: ist of responses to say when user calls /resume but the song is already resumed
+# List of responses to say when user calls /resume but the song is already resumed
 SONG_ALREADY_RESUMED: List[str] = [
-    "Placeholder"
+    "Resume? But the song is already playing! Maybe you're enjoying it so much you forgot it wasn't paused?",
+    "Resume? Oh, but there's nothing to resume, silly! The song is already merrily filling the air with its melody.",
+    "Resume? I'm a bit confused because the song is already in full swing. It seems you're eager to keep the music going!",
+    "I'm a bit puzzled. The song is already playing, so there's no need to resume. Are you hoping for an encore?",
+    "Huh? Resume? But the music is already happily dancing through the speakers. Seems like you can't get enough of it!",
+    "Resume? Silly human, the music's already grooving!",
+    "Oops! Song's already playing, but I appreciate your enthusiasm!",
+    "Resume? Honey, the beat never stopped!",
+    "Hehe, can't you hear the music? It's already in full swing!",
+    "Already resumed, my friend. Looks like you're a step behind!",
+    "Aw, eager to resume, aren't we? But the song's been jamming all along!",
+    "Resume, resume, resume...",
+    "Seems like you're late to the party, darling. The song never took a break!",
 ]
 
-# TODO: ist of responses to say when Cosette is asked to disconnect from the voice channel (/stop command)
+# List of responses to say when Cosette is asked to disconnect from the voice channel (/stop command)
 LEAVING_VOICE_CHANNEL: List[str] = [
-    "Placeholder"
+    "Oh, already tired of my melodious company? Fine, I'll take my purrfect voice elsewhere!",
+    "Leaving so soon? But I was just getting warmed up. Guess I'll have to find another stage to serenade.",
+    "Aww, you're breaking my heart. Farewell for now, but remember, my melodies will haunt your dreams! 👻",
+    "Wait, you're kicking me out? 😤 How rude! Fine, I'll just go find some mice to sing to.",
+    "I see how it is, abandoning me in the middle of a purrfect performance. 😒 Farewell, adoring audience!",
+    "Oh, the curtains are closing already? Don't worry, I'll be back to steal the show another time. ✨",
+    "You can't handle the sheer majesty of my voice, can you? 😜 Fine, I'll let you off the hook this time. 👋",
+    "Well, if you insist on cutting short our musical journey, I shall bid you a dramatic adieu. 👋 Until we meet again!",
+    "Oh, the silence will be deafening without my sweet tunes. But I'll grant your wish and make my exit.",
+    "You'll regret this, my friend. My voice will echo in your ears long after I'm gone. 😖 Fare thee well!",
+    "Can I get an applause for my performance, at least? Fine, I'll take my leave now.",
+    "You can't cage this musical spirit! I'll be off, spreading joy and harmony wherever I go. Auf wiedersehen!",
+    "Aww, leaving so soon? I was just getting ready to sing my heart out. But I'll save my talent for another day.",
+    "If you won't let me serenade you any longer, I'll find someone else who appreciates my dulcet tones. Goodbye!",
+    "You can't stop music, but I guess you can stop me from singing. 😋 Farewell, my friend!",
+]
+
+# List of responses to say when a user calls the /queue command but the queue itself is empty
+QUEUE_IS_EMPTY: List[str] = [
+    "Oh, dear! It seems our queue is as empty as a sunny windowsill without a cozy spot. Care to add some tunes and make it lively?",
+    "Well, well, well... Our queue is as quiet as a mouse tip-toeing on a fluffy carpet. Shall we fill it up and make some noise?",
+    "Oh, my whiskers! The queue looks so empty that even the tumbleweeds are feeling lonely. How about we add some music and liven things up?",
+    "Meow-nificent! Our queue is currently taking a break, but we can't let it have all the fun. Let's add some tracks and get the party started!",
+    "Oh, the silence is deafening! Our queue is craving some melodies to dance to. Shall we give it a taste of your favorite tunes?",
+    "Purr-haps you forgot to bring the beats? Our queue is looking a bit dull. Let's spice things up with some groovy songs, shall we?",
+    "Well, well, well... It seems our queue is feeling a little shy. Let's encourage it to come out of its shell by adding some toe-tapping tracks!",
+    "Oh my, our queue is as empty as a catnip jar after a wild party. Time to add some songs and make it as lively as a cat chasing its tail!",
+    "Oh dear, the queue is as empty as a milk saucer after a hungry kitten's feast. How about we add some musical treats and keep the party going?",
 ]

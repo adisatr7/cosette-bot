@@ -161,7 +161,7 @@ def pause() -> str:
     return selected_response
 
 
-def music_already_paused() -> str:
+def song_already_paused() -> str:
     """
     Selects a random response from a list for when the user calls for
     /pause but the music is already paused.
@@ -171,10 +171,10 @@ def music_already_paused() -> str:
     """
 
     # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.MUSIC_ALREADY_PAUSED) - 1)
+    random_index = randint(0, len(responses.SONG_ALREADY_PAUSED) - 1)
 
     # Retrieve the greeting at the random index
-    selected_response = responses.MUSIC_ALREADY_PAUSED[random_index]
+    selected_response = responses.SONG_ALREADY_PAUSED[random_index]
 
     return selected_response
 
@@ -197,19 +197,56 @@ def resume_song() -> str:
     return selected_response
 
 
-def already_resumed() -> str:
+def song_already_resumed() -> str:
     """
-    Selects a random response from a list for when the user
-    calls for /resume but the music is already resumed.
+    Selects a random response from a list for when the 
+    user calls for /resume but the music is already resumed.
 
     Returns:
         str: Randomly selected response.
     """
 
     # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.RESUMING_SONG) - 1)
+    random_index = randint(0, len(responses.SONG_ALREADY_RESUMED) - 1)
 
     # Retrieve the greeting at the random index
-    selected_response = responses.RESUMING_SONG[random_index]
+    selected_response = responses.SONG_ALREADY_RESUMED[random_index]
+
+    return selected_response
+
+
+def leave_voice_channel() -> str:
+    """
+    Selects a random response from a list for when the
+    user calls for /stop command, in which Cosette
+    will leave the voice channel.
+
+    Returns:
+        str: Randomly selected response.
+    """
+
+    # Select a random index within the range of responses list
+    random_index = randint(0, len(responses.LEAVING_VOICE_CHANNEL) - 1)
+
+    # Retrieve the greeting at the random index
+    selected_response = responses.LEAVING_VOICE_CHANNEL[random_index]
+
+    return selected_response
+
+
+def queue_is_empty() -> str:
+    """
+    Selects a random response from a list for when the
+    user calls for /queue command but the queue is empty.
+
+    Returns:
+        str: Randomly selected response.
+    """
+
+    # Select a random index within the range of responses list
+    random_index = randint(0, len(responses.QUEUE_IS_EMPTY) - 1)
+
+    # Retrieve the greeting at the random index
+    selected_response = responses.QUEUE_IS_EMPTY[random_index]
 
     return selected_response

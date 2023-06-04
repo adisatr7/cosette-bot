@@ -144,7 +144,7 @@ async def pause(interaction: nextcord.Interaction) -> None:
 
         # Otherwise, have her tell the user that she's not playing anything
         else:
-            await interaction.response.send_message(respond.music_already_paused())
+            await interaction.response.send_message(respond.song_already_paused())
 
     # Exception handler: When the bot is not in a voice channel
     except Exception as e:
@@ -169,9 +169,8 @@ async def resume(interaction: nextcord.Interaction) -> None:
             await interaction.response.send_message(respond.resume_song())
 
         # Otherwise, have her tell the user that the song is already resumed
-        # TODO: Implement
         else:
-            await interaction.response.send_message("Song is already resumed!")
+            await interaction.response.send_message(respond.song_already_resumed())
 
     # Exception handler: When the bot is not in a voice channel
     except Exception as e:
@@ -192,9 +191,8 @@ async def stop(interaction: nextcord.Interaction) -> None:
     if not vc.queue.is_empty:
         await vc.queue.clear()
 
-    # Have Cosette tells the user that the music player has been stopped
-    # TODO: Add response variety!
-    await interaction.response.send_message("Song is stopped!")
+    # Have Cosette tells the user a message as she leaves the voice channel
+    await interaction.response.send_message(respond.leave_voice_channel())
 
 
 # See queue command
@@ -234,23 +232,26 @@ async def queue(interaction: nextcord.Interaction) -> None:
         else:
 
             # Have Cosette tells the user that the queue is indeed empty
-            # TODO: Add response variety!
-            await interaction.response.send_message("The queue is empty!")
+            await interaction.response.send_message(respond.queue_is_empty())
 
     # Exception handler: If the 'queue' object is not initialized
     except AttributeError as e:
 
         # Have Cosette tells the user that she's not playing anything at the moment
-        await interaction.response.send_message(respond.no_song())
+        await interaction.response.send_message(respond.queue_is_empty())
 
 
 # Roll dice command | TODO: Add response variety
 @bot.slash_command(guild_ids=[], description="Have Cosette roll various dice for your TTRPG nerds.")
-async def roll(interaction: nextcord.Interaction, die_type: Literal['d2', 'd4', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100'], amount: int) -> None:
+async def roll(
+    interaction: nextcord.Interaction,
+    die_type: Literal['d20', 'd12', 'd10', 'd100', 'd8', 'd6', 'd4', 'd2'],
+    amount: int
+) -> None:
 
     # Sets the max roll based on the die type used
     max_roll: int = int(re.findall(r"\d+", die_type)[0])
-    
+
     # Do the rolling | TODO: Add support for multiple rolls
     result: int | str = randint(1, max_roll)
 
