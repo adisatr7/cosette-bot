@@ -1,9 +1,11 @@
 # Import necessary libraries
 import nextcord
-import modules.chat as chat
+import modules.response_variety as respond
 import wavelink
+import re
+from random import randint
 from nextcord.ext import commands
-from typing import List
+from typing import List, Literal
 from constants.prefixes import COMMAND_PREFIXES
 
 
@@ -42,7 +44,7 @@ async def on_ready() -> None:
     await bot.change_presence(activity=activity)
 
     # Have Cosette send a greeting to the console
-    print(f"{ chat.come_online() } \n")
+    print(f"{ respond.come_online() } \n")
 
     # Have Cosette connects to a node for her music player to function correctly
     bot.loop.create_task(on_node())
@@ -59,13 +61,13 @@ async def on_message(message: nextcord.Message or None) -> None:
         print(f"{message.author}: \"{message.content}\"")
 
         # Have her respond to the chat
-        response: str = chat.respond_to_mention()
+        response: str = response.respond_to_mention()
         await message.channel.send(response)
 
 
-# Play command | TODO: Add Spotify support
-@bot.slash_command(guild_ids=[], description="Summon Cosette and let her work her magic with a YouTube jam!")
-async def play(interaction: nextcord.Interaction, search: str) -> None:
+# Play command | TODO: Add Spotify support and USE EMBED
+@bot.slash_command(guild_ids=[], description="Summon Cosette and let her work her magic with a YouTube jam")
+async def play(interaction: nextcord.Interaction, search: str, play_now: bool | None) -> None:
 
     # Do a YouTube search
     query = await wavelink.YouTubeTrack.search(search, return_first=True)
@@ -84,12 +86,18 @@ async def play(interaction: nextcord.Interaction, search: str) -> None:
     # If the queue is empty and the player is not playing, have Cosette play the song now
     if vc.queue.is_empty and not vc.is_playing():
         await vc.play(query)
-        await interaction.response.send_message(f"Now playing: {vc.current.title}")
+        await interaction.response.send_message(respond.starts_playing_a_song())
+
+        # TODO: Replace with embed
+        await interaction.channel.send(f"🎵  Now playing: **__{vc.current.title}__**")
 
     # Otherwise, add the song to queue
-    else:
+    elif not play_now:
         await vc.queue.put_wait(query)
-        await interaction.response.send_message(f"{query.title} has been added to queue!")
+        await interaction.response.send_message(respond.add_song_to_queue())
+        
+        # TODO: Replace with embed
+        await interaction.channel.send(f"🎶  **__{query.title}__** has been added to queue!")
 
 
 # Skip command
@@ -99,12 +107,24 @@ async def skip(interaction: nextcord.Interaction) -> None:
     # Initializes Wavelink Player
     vc: wavelink.Player = interaction.guild.voice_client
 
-    # Have Cosette stops the current song. The whole thing is set so that
-    # it automatically plays the next song if the current one is stopped
-    await vc.stop()
+    try:
+        if not vc.queue.is_empty:
 
-    # Have Cosette tells the user that the song is skipped | TODO: Add response variety!
-    await interaction.response.send_message("Song was skipped!")
+            # Have Cosette tells the user that the song is skipped
+            await interaction.response.send_message(respond.skip_song())
+
+            # TODO: Use embed to display the next song info
+            await interaction.channel.send(f"🎵  Now playing **__{vc.queue[0].title}__**")
+
+            # Have Cosette stops the current song. The whole thing is set so that
+            # it automatically plays the next song if the current one is stopped
+            await vc.stop()
+
+        else:
+            await interaction.response.send_message(respond.no_more_songs())
+
+    except nextcord.errors.ApplicationInvokeError as e:
+        await interaction.response.send_message(respond.no_more_songs())
 
 
 # Pause command
@@ -114,17 +134,21 @@ async def pause(interaction: nextcord.Interaction) -> None:
     # Initializes Wavelink Player
     vc: wavelink.Player = interaction.guild.voice_client
 
-    # If Cosette is currently playing a song, have her pause it now
-    if not vc.is_paused():
-        await vc.pause()
+    try:
+        # If Cosette is currently playing a song, have her pause it now
+        if not vc.is_paused():
+            await vc.pause()
 
-        # Have her tell the user that the song is paused
-        await interaction.response.send_message("Song is paused!")
+            # Have her tell the user that the song is paused
+            await interaction.response.send_message(respond.pause())
 
-    # Otherwise, have her tell the user that she's not playing anything
-    else:
-        # TODO: Add response variety!
-        await interaction.response.send_message("Song is already paused!")
+        # Otherwise, have her tell the user that she's not playing anything
+        else:
+            await interaction.response.send_message(respond.music_already_paused())
+
+    # Exception handler: When the bot is not in a voice channel
+    except Exception as e:
+        await interaction.response.send_message(respond.no_song())
 
 
 # Resume command
@@ -134,18 +158,24 @@ async def resume(interaction: nextcord.Interaction) -> None:
     # Initializes Wavelink Player
     vc: wavelink.Player = interaction.guild.voice_client
 
-    # If the current song is indeed being paused
-    if vc.is_paused():
+    try:
+        # If the current song is indeed being paused
+        if vc.is_paused():
 
-        # Have Cosette resumes it
-        await vc.resume()
+            # Have Cosette resumes it
+            await vc.resume()
 
-        # Have her tell the user that the song is already playing
-        await interaction.response.send_message("Song is resuming!")
+            # Have her tell the user that the song is already playing
+            await interaction.response.send_message(respond.resume_song())
 
-    # Otherwise, have her tell the user that the song is already resumed
-    else:
-        await interaction.response.send_message("Song is already resumed!")
+        # Otherwise, have her tell the user that the song is already resumed
+        # TODO: Implement
+        else:
+            await interaction.response.send_message("Song is already resumed!")
+
+    # Exception handler: When the bot is not in a voice channel
+    except Exception as e:
+        await interaction.response.send_message(respond.no_song())
 
 
 # Stop command
@@ -159,7 +189,8 @@ async def stop(interaction: nextcord.Interaction) -> None:
     await vc.disconnect()
 
     # Have Cosette clears the music player queue
-    await vc.queue.clear()
+    if not vc.queue.is_empty:
+        await vc.queue.clear()
 
     # Have Cosette tells the user that the music player has been stopped
     # TODO: Add response variety!
@@ -173,37 +204,67 @@ async def queue(interaction: nextcord.Interaction) -> None:
     # Initializes Wavelink Player
     vc: wavelink.Player = interaction.guild.voice_client
 
-    # If the queue is not empty
-    if not vc.queue.is_empty:
+    try:
+        # If the queue is not empty
+        if not vc.queue.is_empty:
 
-        # Counts how many songs are in the queue
-        song_counter: int = 0
+            # Counts how many songs are in the queue
+            song_counter: int = 0
 
-        # Initializes the list of songs currently being queued by the music player
-        songs: List[wavelink.PLayable | wavelink.SpotifyTrack] = []
-        queue = vc.queue.copy()
+            # Initializes the list of songs currently being queued by the music player
+            songs: List[wavelink.PLayable | wavelink.SpotifyTrack] = []
+            queue = vc.queue.copy()
 
-        # Setup an embed message
-        embed: nextcord.Embed = nextcord.Embed(title="Queue")
+            # Setup an embed message | TODO: Make it look better
+            embed: nextcord.Embed = nextcord.Embed(title="Queue")
 
-        for song in queue:
-            song_counter += 1
-            songs.append(song)
-            embed.add_field(
-                name=f"[{song_counter}] Duration: {song.duration}",
-                value=song.title,
-                inline=False
-            )
+            for song in queue:
+                song_counter += 1
+                songs.append(song)
+                embed.add_field(
+                    name=f"[{song_counter}] Duration: {song.duration}",
+                    value=song.title,
+                    inline=False
+                )
 
-        # Send the embed message containing queue data to the user
-        await interaction.response.send_message(embed=embed)
+            # Send the embed message containing queue data to the user
+            await interaction.response.send_message(embed=embed)
 
-    # If the queue is empty
+        # If the queue is empty
+        else:
+
+            # Have Cosette tells the user that the queue is indeed empty
+            # TODO: Add response variety!
+            await interaction.response.send_message("The queue is empty!")
+
+    # Exception handler: If the 'queue' object is not initialized
+    except AttributeError as e:
+
+        # Have Cosette tells the user that she's not playing anything at the moment
+        await interaction.response.send_message(respond.no_song())
+
+
+# Roll dice command | TODO: Add response variety
+@bot.slash_command(guild_ids=[], description="Have Cosette roll various dice for your TTRPG nerds.")
+async def roll(interaction: nextcord.Interaction, die_type: Literal['d2', 'd4', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100'], amount: int) -> None:
+
+    # Sets the max roll based on the die type used
+    max_roll: int = int(re.findall(r"\d+", die_type)[0])
+    
+    # Do the rolling | TODO: Add support for multiple rolls
+    result: int | str = randint(1, max_roll)
+
+    # Bold the result if it is equal to the max die
+    if result == max_roll:
+        result = f"**({result})**"
+
+    # Otherwise, let it be
     else:
+        result = f"({result})"
 
-        # Have Cosette tells the user that the queue is indeed empty
-        # TODO: Add response variety!
-        await interaction.response.send_message("The queue is empty!")
+    # Send the roll result to the user
+    await interaction.response.send_message("Sure, rolling... \n")
+    await interaction.channel.send(f"🎲 {amount or 1}{die_type} = { result }")
 
 
 # Keep Cosette up and running by looping this whole process
