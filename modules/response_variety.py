@@ -250,3 +250,20 @@ def queue_is_empty() -> str:
     selected_response = responses.QUEUE_IS_EMPTY[random_index]
 
     return selected_response
+
+def rolling_dice() -> str:
+    """
+    Selects a random response from a list for when the
+    Cosette is about to roll dice.
+
+    Returns:
+        str: Randomly selected response.
+    """
+
+    # Select a random index within the range of responses list
+    random_index = randint(0, len(responses.QUEUE_IS_EMPTY) - 1)
+
+    # Retrieve the greeting at the random index
+    selected_response = responses.QUEUE_IS_EMPTY[random_index]
+
+    return selected_response

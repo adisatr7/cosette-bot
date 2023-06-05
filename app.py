@@ -67,7 +67,11 @@ async def on_message(message: nextcord.Message or None) -> None:
 
 # Play command | TODO: Add Spotify support and USE EMBED
 @bot.slash_command(guild_ids=[], description="Summon Cosette and let her work her magic with a YouTube jam")
-async def play(interaction: nextcord.Interaction, search: str, play_now: bool | None) -> None:
+async def play(
+    interaction: nextcord.Interaction,
+    search: str = nextcord.SlashOption(description="Enter the search query or YouTube URL of the song you want to play"),
+    override: bool | None = nextcord.SlashOption(description="Override the current queue and start playing immediately (optional)")
+) -> None:
 
     # Do a YouTube search
     query = await wavelink.YouTubeTrack.search(search, return_first=True)
@@ -84,7 +88,7 @@ async def play(interaction: nextcord.Interaction, search: str, play_now: bool | 
         vc: wavelink.Player = interaction.guild.voice_client
 
     # If the queue is empty and the player is not playing, have Cosette play the song now
-    if vc.queue.is_empty and not vc.is_playing():
+    if override or not vc.is_playing():
         await vc.play(query)
         await interaction.response.send_message(respond.starts_playing_a_song())
 
@@ -92,10 +96,10 @@ async def play(interaction: nextcord.Interaction, search: str, play_now: bool | 
         await interaction.channel.send(f"🎵  Now playing: **__{vc.current.title}__**")
 
     # Otherwise, add the song to queue
-    elif not play_now:
+    elif not override:
         await vc.queue.put_wait(query)
         await interaction.response.send_message(respond.add_song_to_queue())
-        
+
         # TODO: Replace with embed
         await interaction.channel.send(f"🎶  **__{query.title}__** has been added to queue!")
 
@@ -242,30 +246,55 @@ async def queue(interaction: nextcord.Interaction) -> None:
 
 
 # Roll dice command | TODO: Add response variety
-@bot.slash_command(guild_ids=[], description="Have Cosette roll various dice for your TTRPG nerds.")
+@bot.slash_command(guild_ids=[], description="Have Cosette roll various dice for you TTRPG nerds.")
 async def roll(
     interaction: nextcord.Interaction,
-    die_type: Literal['d20', 'd12', 'd10', 'd100', 'd8', 'd6', 'd4', 'd2'],
-    amount: int
+    die_type: Literal['d20', 'd12', 'd10', 'd100', 'd8', 'd6', 'd4', 'd2'] = nextcord.SlashOption(description="Choose the die type."),
+    amount: int | None = nextcord.SlashOption(min_value=1, description="Set how many dice you want to roll. Defaults to 1 if left empty.")
 ) -> None:
 
     # Sets the max roll based on the die type used
     max_roll: int = int(re.findall(r"\d+", die_type)[0])
 
-    # Do the rolling | TODO: Add support for multiple rolls
-    result: int | str = randint(1, max_roll)
+    # Prepares a variable named 'result' that can be an Integer or String
+    rolled: int | str = 0
 
-    # Bold the result if it is equal to the max die
-    if result == max_roll:
-        result = f"**({result})**"
+    # Prepares a variable named 'output' for the output, duh~
+    output: str = ""
 
-    # Otherwise, let it be
+    # If user asks for multiple dice to be rolled
+    if amount is not None and amount > 1:
+
+        # Prepares a list of numbers to store all the results
+        results: List[int] = []
+
+        # Prepares an integer to store the total value of all rolls
+        total: int = 0
+
+        # Do the rolling
+        for i in range(amount):
+            rolled = randint(1, max_roll)
+            total += rolled
+
+            # Bold the result if it's a nat 1 or nat max
+            if rolled == max_roll or rolled == 1:
+                rolled = f"**{rolled}**"
+
+            # Append the roll result into the list of results
+            results.append(rolled)
+
+        output = f"{results} \n**Total:** {total}"
+
+    # If user asks for a single roll
     else:
-        result = f"({result})"
+        rolled = randint(1, max_roll)
+
+        # Bold the result if it's a nat 1 or nat max
+        output = f"**({rolled})**" if rolled == max_roll else f"({rolled})"
 
     # Send the roll result to the user
-    await interaction.response.send_message("Sure, rolling... \n")
-    await interaction.channel.send(f"🎲 {amount or 1}{die_type} = { result }")
+    await interaction.response.send_message(respond.rolling_dice())
+    await interaction.channel.send(f"🎲 {amount or 1}{die_type} = { output }")
 
 
 # Keep Cosette up and running by looping this whole process
