@@ -52,6 +52,7 @@ def respond_to_mention() -> str:
 
     return selected_response
 
+
 def starts_playing_a_song() -> str:
     """
     Selects a random response from a list for when when a user starts playing a 
@@ -84,6 +85,24 @@ def add_song_to_queue() -> str:
 
     # Retrieve the greeting at the random index
     selected_response = responses.ADD_TO_QUEUE[random_index]
+
+    return selected_response
+
+
+def user_not_in_voice_channel() -> str:
+    """
+    Selects a random response from a list for when a user starts adding a
+    song to the queue while the music player is playing.
+
+    Returns:
+        str: Randomly selected response.
+    """
+
+    # Select a random index within the range of responses list
+    random_index = randint(0, len(responses.USER_NOT_IN_VOICE_CHANNEL) - 1)
+
+    # Retrieve the greeting at the random index
+    selected_response = responses.USER_NOT_IN_VOICE_CHANNEL[random_index]
 
     return selected_response
 
@@ -234,6 +253,25 @@ def leave_voice_channel() -> str:
     return selected_response
 
 
+def already_stopped():
+    """
+    Selects a random response from a list for when the
+    user calls for /stop command but Cosette is not even
+    in any voice channel.
+
+    Returns:
+        str: Randomly selected response.
+    """
+
+    # Select a random index within the range of responses list
+    random_index = randint(0, len(responses.ALREADY_STOPPED) - 1)
+
+    # Retrieve the greeting at the random index
+    selected_response = responses.ALREADY_STOPPED[random_index]
+
+    return selected_response
+
+
 def queue_is_empty() -> str:
     """
     Selects a random response from a list for when the
@@ -251,6 +289,7 @@ def queue_is_empty() -> str:
 
     return selected_response
 
+
 def rolling_dice() -> str:
     """
     Selects a random response from a list for when the
@@ -261,9 +300,27 @@ def rolling_dice() -> str:
     """
 
     # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.QUEUE_IS_EMPTY) - 1)
+    random_index = randint(0, len(responses.ROLLING) - 1)
 
     # Retrieve the greeting at the random index
-    selected_response = responses.QUEUE_IS_EMPTY[random_index]
+    selected_response = responses.ROLLING[random_index]
+
+    return selected_response
+
+
+def get_rick_rolled() -> str:
+    """
+    Selects a random response from a list for when Cosette
+    detects a rick roll.
+
+    Returns:
+        str: Randomly selected response.
+    """
+
+    # Select a random index within the range of responses list
+    random_index = randint(0, len(responses.RICK_ROLLED) - 1)
+
+    # Retrieve the greeting at the random index
+    selected_response = responses.RICK_ROLLED[random_index]
 
     return selected_response

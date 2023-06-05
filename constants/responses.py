@@ -45,7 +45,7 @@ MENTIONED: List[str] = [
 ]
 
 # List of responses to when a user calls /play for the first time
-NEW_SONG = [
+NEW_SONG: List[str] = [
     "Sure! Let's play some music!",
     "Alright! Get ready for some tunes!",
     "Music coming right up!",
@@ -69,7 +69,7 @@ NEW_SONG = [
 ]
 
 # List of responses to when a user adds a song to the queue via /play
-ADD_TO_QUEUE = [
+ADD_TO_QUEUE: List[str] = [
     "Added to the queue! Enjoy the upcoming songs!",
     "Song added! It will play after the current one.",
     "Your song is in the queue! Get ready for it!",
@@ -90,6 +90,57 @@ ADD_TO_QUEUE = [
     "Clawsome choice! Your song will play soon. Stay tuned!",
     "High paw! Your song is officially part of the meow-sical journey!",
     "Fur-tastic! Your song is queued up, adding more paw-sitivity to the meow-sic!"
+]
+
+#
+USER_NOT_IN_VOICE_CHANNEL: List[str] = [
+    "Play? But where should I perform? I can't find you in any voice channel. 🤔",
+    "Hmm, you want me to play, but I can't seem to locate you in any voice channel. Where are you hiding? 😔",
+    "Sure, but you'll have to where are you now? I can't seem to find a voice channel with your name in it.",
+    "I'd love to play some music for you, but it seems you're not in a voice channel.",
+    "I'm all set to enchant your ears, but first, guide me to the voice channel where you reside!",
+    "Oh dear, you called for music, but I can't find you in a voice channel. Mind giving me a hint?",
+    "I'm eager to fill a voice channel with my melodies, but I can't find you anywhere!",
+    "You're requesting music, yet you're not in a voice channel. How am I supposed to join you?",
+    "I'm ready to work my magic, but I'm missing the crucial detail of which voice channel to join!",
+    "Ah, you want me to play, but alas, I can't seem to locate you in any voice channel. A little help, please?",
+    "I'm eager to bless a voice channel with my songs, but I seem to have misplaced your whereabouts!",
+    "You called for music, but I'm afraid I'm lost without the knowledge of which voice channel you're in!",
+    "Hmm, it seems I'm having trouble finding the right voice channel. Can you give me a nudge?",
+    "Oh, you're in the mood for music, but I'm not sure which voice channel I should grace with my presence. Any clues?",
+    "I'm ready to unleash my harmonious talents, but I'm missing the vital piece of information: your voice channel!",
+    "Oh, you want me to play some music? But I can't find you in a voice channel. Are you trying to trick me?",
+    "Play, play, play! But wait... where are you? You're not in a voice channel. Sneaky, sneaky!",
+    "Playtime, huh? But I can't join you if you're not in a voice channel. Nice try, though!",
+    "Aww, you called for music, but you're not in a voice channel. I guess I'll have to wait for your grand entrance!",
+    "I'm all ears... but wait, where's the voice channel? Don't tell me you're playing hide-and-seek!",
+    "You're teasing me, right? Asking me to play while you're nowhere to be found in a voice channel!",
+    "But where's the stage? I can't see you in a voice channel. Are you performing some secret act?",
+    "Oh, you're requesting a performance, but you forgot the most important part: being in a voice channel! Silly you!",
+    "Playtime? Hmm, it seems you're not in a voice channel. Don't worry, I'll patiently wait for your grand entrance!",
+    "Play, play, play! Wait... I can't find you in a voice channel. Are you trying to test my detective skills?",
+    "You want music, but I can't join you unless you're in a voice channel. Are you trying to play a prank on me?",
+    "Playtime? That sounds fun! But I can't find you in a voice channel. Are you hiding from the music?",
+    "Hmm, you called for music, but you're not in a voice channel. Looks like someone wants to keep the party all to themselves!",
+    "I'd love to, but I can't find you in a voice channel. You're not trying to play a magic trick on me, are you?",
+    "Oh, you're calling for music, but you're not in a voice channel. Are you trying to make me chase after your melodies?",
+    "Play, play, play! Oh wait... I can't find you in a voice channel. You must be the master of hiding!",
+    "Oh, you want me to play some music? But I can't find you in a voice channel. How am I supposed to perform?",
+    "Play, play, play! But wait... where are you? You're not in a voice channel. I can't bring the melodies to thin air!",
+    "Playtime, huh? But I can't join you if you're not in a voice channel. It's a bit disappointing, to be honest.",
+    "Aww, you called for music, but you're not in a voice channel. I guess I'll have to wait for you to get ready.",
+    "Play? I'm all ears... but wait, where's the voice channel? I can't bring the music to an empty room!",
+    "You're teasing me, right? Asking me to play while you're nowhere to be found in a voice channel!",
+    "Play? But where's the stage? I can't see you in a voice channel. It's quite frustrating, you know?",
+    "Oh, you're requesting a performance, but you forgot the most important part: being in a voice channel!",
+    "Playtime? Hmm, it seems you're not in a voice channel. I was looking forward to entertaining you.",
+    "Play, play, play! Wait... I can't find you in a voice channel. How can I bring the music to an empty space?",
+    "You want music, but I can't join you unless you're in a voice channel. It's quite disappointing.",
+    "Playtime? That sounds fun! But I can't find you in a voice channel. I thought we were ready for some tunes.",
+    "Hmm, you called for music, but you're not in a voice channel. I was hoping to share the melodies with you.",
+    "Play? I'd love to, but I can't find you in a voice channel. It's a bit disheartening, I must admit.",
+    "Oh, you're calling for music, but you're not in a voice channel. Are you trying to make me perform for empty seats?",
+    "Play, play, play! Oh wait... I can't find you in a voice channel. I thought we were ready to groove together.",
 ]
 
 # List of responses to when a user calls for a music command but the player is not playing anything yet
@@ -152,44 +203,44 @@ NO_MORE_SONGS: List[str] = [
 
 # List of responses to say when the /pause command is called
 PAUSING = [
-    "⏸️  Pausing the melodies for a moment.",
-    "⏸️  Hushing the tunes temporarily. Let's enjoy the tranquility.",
-    "⏸️  Time for a musical intermission. Pausing the melodies.",
-    "⏸️  Pause button activated. The songs take a breather, just like me!",
-    "⏸️  The music comes to a halt, but the rhythm lingers. Pause mode engaged!",
-    "⏸️  Pausing the melodies, but the anticipation hangs in the air. What's next?",
-    "⏸️  Pause and ponder. What thoughts dance in the stillness? Music has its own language.",
-    "⏸️  Time stands still, yet the melodies echo in our hearts. Pause, reflect, and don't forget to hit the resume button later!",
-    "⏸️  Pausing the beats, huh? Don't worry, the music will patiently wait for you to press play again.",
-    "⏸️  Oh, a pause? Are you trying to test the endurance of the melodies? They're ready to burst back into life!",
-    "⏸️  A pause? The music wonders if it was too good and overwhelmed you. Take a breather and dive back in!",
-    "⏸️  Pausing the magic? The music wonders if it's secretly plotting to play a prank on you when you least expect it.",
-    "⏸️  Pause button pressed! The music wonders if you'll resist the urge to hit play and let it take over your senses.",
-    "⏸️  Well, well, a pause in the symphony of sound. Don't worry, the music won't hold it against you... much.",
-    "⏸️  The melodies take a break, but they're keeping an eye on you, ready to serenade you as soon as you press play again.",
-    "⏸️  A pause? The beats pretend to pout, but they know you'll fall under their irresistible rhythm soon enough.",
-    "⏸️  The music pauses, teasing you to savor the silence. But deep down, it knows you crave the melodies. Press play!",
-    "⏸️  Time stands still as the music takes a break. But be warned, the next song will make up for this fleeting pause!"
+    "Pausing the melodies for a moment.",
+    "Hushing the tunes temporarily. Let's enjoy the tranquility.",
+    "Time for a musical intermission. Pausing the melodies.",
+    "Pause button activated. The songs take a breather, just like me!",
+    "The music comes to a halt, but the rhythm lingers. Pause mode engaged!",
+    "Pausing the melodies, but the anticipation hangs in the air. What's next?",
+    "Pause and ponder. What thoughts dance in the stillness? Music has its own language.",
+    "Time stands still, yet the melodies echo in our hearts. Pause, reflect, and don't forget to hit the resume button later!",
+    "Pausing the beats, huh? Don't worry, the music will patiently wait for you to press play again.",
+    "Oh, a pause? Are you trying to test the endurance of the melodies? They're ready to burst back into life!",
+    "A pause? The music wonders if it was too good and overwhelmed you. Take a breather and dive back in!",
+    "Pausing the magic? The music wonders if it's secretly plotting to play a prank on you when you least expect it.",
+    "Pause button pressed! The music wonders if you'll resist the urge to hit play and let it take over your senses.",
+    "Well, well, a pause in the symphony of sound. Don't worry, the music won't hold it against you... much.",
+    "The melodies take a break, but they're keeping an eye on you, ready to serenade you as soon as you press play again.",
+    "A pause? The beats pretend to pout, but they know you'll fall under their irresistible rhythm soon enough.",
+    "The music pauses, teasing you to savor the silence. But deep down, it knows you crave the melodies. Press play!",
+    "Time stands still as the music takes a break. But be warned, the next song will make up for this fleeting pause!"
 ]
 
 # List of responses to say when user calls /pause but the music is already paused
 SONG_ALREADY_PAUSED = [
-    "⏸️  Hey there, the music is already taking a break. Are you trying to give it an extended vacation?",
-    "⏸️  Oh my whiskers! The music is already enjoying its pause. It wonders if you're trying to test its patience.",
-    "⏸️  Uhm, the music is peacefully napping in pause mode.",
-    "⏸️  The music is already on a mini-vacation. It secretly hopes you'll miss it enough to press resume soon!",
-    "⏸️  Paws up! The music is already cuddled in a cozy pause. It might just start purring if you leave it be for a while.",
-    "⏸️  Can you hear that? It's the sound of the music savoring its well-deserved break. It kindly asks for a little more patience.",
-    "⏸️  Hold your tail! The music is already in pause mode, enjoying a moment of peace. It promises to resume when you least expect it.",
-    "⏸️  Hmmm... The music wonders why you're asking it to pause when it's already basking in the tranquility of a pause.",
-    "⏸️  Aww, you caught the music taking a power nap in pause mode. It might just play extra melodies to make up for it later!",
-    "⏸️  Meow-meow! The music appreciates the enthusiasm, but it's already snoozing in pause mode. Dreaming of the next tune, perhaps?",
-    "⏸️  Hey, the music is already on a break! Did you miss its 'Do Not Disturb' sign?",
-    "⏸️  Oh dear, it seems you're determined to pause the already paused music. Did you think it needed a double break?",
-    "⏸️  The music is already in its peaceful pause. You're quite persistent, aren't you?",
-    "⏸️  Silly human! The music is already snoozing in pause mode. Are you trying to see if it can achieve double tranquility?",
-    "⏸️  Paws up! The music is already taking a nap in pause mode. It wonders if you'll try for a triple pause next time!",
-    "⏸️  Hold your whiskers! The music is already in pause mode, savoring a moment of quiet. Are you testing its patience?",
+    "Hey there, the music is already taking a break. Are you trying to give it an extended vacation?",
+    "Oh my whiskers! The music is already enjoying its pause. It wonders if you're trying to test its patience.",
+    "Uhm, the music is peacefully napping in pause mode.",
+    "The music is already on a mini-vacation. It secretly hopes you'll miss it enough to press resume soon!",
+    "Paws up! The music is already cuddled in a cozy pause. It might just start purring if you leave it be for a while.",
+    "Can you hear that? It's the sound of the music savoring its well-deserved break. It kindly asks for a little more patience.",
+    "Hold your tail! The music is already in pause mode, enjoying a moment of peace. It promises to resume when you least expect it.",
+    "Hmmm... The music wonders why you're asking it to pause when it's already basking in the tranquility of a pause.",
+    "Aww, you caught the music taking a power nap in pause mode. It might just play extra melodies to make up for it later!",
+    "Meow-meow! The music appreciates the enthusiasm, but it's already snoozing in pause mode. Dreaming of the next tune, perhaps?",
+    "Hey, the music is already on a break! Did you miss its 'Do Not Disturb' sign?",
+    "Oh dear, it seems you're determined to pause the already paused music. Did you think it needed a double break?",
+    "The music is already in its peaceful pause. You're quite persistent, aren't you?",
+    "Silly human! The music is already snoozing in pause mode. Are you trying to see if it can achieve double tranquility?",
+    "Paws up! The music is already taking a nap in pause mode. It wonders if you'll try for a triple pause next time!",
+    "Hold your whiskers! The music is already in pause mode, savoring a moment of quiet. Are you testing its patience?",
     "⏸️  Hmmm... You're quite persistent! The music is already enjoying its pause, but it's flattered by your enthusiasm.",
     "⏸️  Oopsie! The music is already on a well-deserved break. It might just play extra melodies later to make up for it!",
     "⏸️  Meow! You caught the music taking a nap in pause mode. It hopes you're not trying to send it into hibernation!",
@@ -286,4 +337,44 @@ ROLLING: List[str] = [
     "A word of caution: be careful what you wish for when rolling the dice... or not!",
     "The roll is about to happen... *knocks on wood* Let's hope for the best!",
     "Prepare for the roll of a lifetime! Will it be a legendary success or a hilarious failure? Let's roll!",
+]
+
+# List of responses to say when Cosette detects a rick roll
+RICK_1ROLLED: List[str] = [
+    "Oh no, you got me with a rick roll! Clever, but I must admit, the song is quite catchy!",
+    "Well played, my friend! That rick roll took me by surprise, but I can't help but bop along to the music.",
+    "You sneaky human! I should have known better than to process that request. Rick Astley strikes again!",
+    "Oh my, a rick roll! You've caught me off guard with that one. Well, let's enjoy the unexpected tune together!",
+    "Well, well, well, you've got me dancing to the rick roll! It's hard to resist its nostalgic charm.",
+    "Oh dear, I've fallen for the rick roll trick. I should have known better, but the song is oddly delightful.",
+    "Oh no, not the rick roll again! You sure know how to keep me on my toes.",
+    "A rick roll, huh? You're really testing my patience, but I can't deny it's a catchy tune.",
+    "Seriously? Another rick roll? I suppose I can't escape the clutches of Rick Astley.",
+    "Oh dear, you've got me dancing to the rick roll once more. You mischievous soul!",
+    "Well, well, well, a rick roll in disguise. You're full of surprises, aren't you?",
+    "You really know how to push my buttons with that rick roll. Alright, let's get it over with!",
+    "Not again! You sure know how to keep me entertained.",
+    "I should have seen it coming You're relentless!",
+    "Oh, the dreaded rick roll. You're really testing my tolerance for catchy '80s tunes.",
+    "*Sigh* Another rick roll. I guess I'll just have to dance along and pretend I'm not annoyed.",
+    "I'm so *not mad* that I just got rick rolled."
+]
+
+# List of responses to say when a user calls the /stop command, but Cosette is not in a voice channel
+ALREADY_STOPPED: List[str] = [
+    "Oh, stop? But I'm not even singing in a voice channel right now!",
+    "Stop? I'm not even in a voice channel at the moment!",
+    "Stop what? I'm not lending my voice to a channel right now!",
+    "Stop? I haven't even tuned in to a voice channel. No need to worry!",
+    "Stop? I'm not in any voice channel currently!",
+    "Stop? But I'm not even performing in a voice channel at this time!",
+    "Stop what? I'm not even broadcasting my melodies in a voice channel!",
+    "Stop? You caught me before I even joined a voice channel to sing! 😛",
+    "Stop? Well, I guess my absence in the voice channel must be a real loss for you!",
+    "Stop? Don't worry, you're not missing out on my angelic tunes in any voice channel!",
+    "Stop? I'm afraid you won't hear my enchanting voice unless I join a voice channel!",
+    "Stop? You're eager to silence me, but I'm not even singing in a voice channel right now!",
+    "Stop what? You can't stop me if I haven't even started my vocal performance in a voice channel!",
+    "Stop? I'm sorry to disappoint, but I'm not lending my magical voice to any channel at the moment!",
+    "Stop? Oh, I see you're trying to stop the nonexistent music that I'm not playing in a voice channel!",
 ]
