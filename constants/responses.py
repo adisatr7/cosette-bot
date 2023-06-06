@@ -1,8 +1,5 @@
-from typing import List
-
-
 # List of greetings that are printed to console when Cosette comes online
-STARTUP: List[str] = [
+STARTUP: list[str] = [
     "Meow! Cosette is here and ready to play! 😺",
     "Hello, lovely humans! Cosette has arrived with a heart full of joy! ❤️",
     "Purrfect day for some fun! Cosette is online and ready to bring smiles! 😸",
@@ -16,7 +13,7 @@ STARTUP: List[str] = [
 ]
 
 # List of greetings (TODO: Add info when this list is used!)
-GREETINGS: List[str] = [
+GREETINGS: list[str] = [
     "Hello there! My name is Cosette. Let's have a great time together!",
     "Hey, I'm Cosette. It's so wonderful to have you here!",
     "Get ready for some memorable adventures with Cosette by your side!",
@@ -33,7 +30,7 @@ GREETINGS: List[str] = [
 ]
 
 # List of responses to being @ mentioned
-MENTIONED: List[str] = [
+MENTIONED: list[str] = [
     "Yes? How can I help you today?",
     "Here, how can I make your day better?",
     "Hiya Papaya! What can I do for you?",
@@ -45,7 +42,7 @@ MENTIONED: List[str] = [
 ]
 
 # List of responses to when a user calls /play for the first time
-NEW_SONG: List[str] = [
+NEW_SONG: list[str] = [
     "Sure! Let's play some music!",
     "Alright! Get ready for some tunes!",
     "Music coming right up!",
@@ -69,7 +66,7 @@ NEW_SONG: List[str] = [
 ]
 
 # List of responses to when a user adds a song to the queue via /play
-ADD_TO_QUEUE: List[str] = [
+ADD_TO_QUEUE: list[str] = [
     "Added to the queue! Enjoy the upcoming songs!",
     "Song added! It will play after the current one.",
     "Your song is in the queue! Get ready for it!",
@@ -92,8 +89,8 @@ ADD_TO_QUEUE: List[str] = [
     "Fur-tastic! Your song is queued up, adding more paw-sitivity to the meow-sic!"
 ]
 
-#
-USER_NOT_IN_VOICE_CHANNEL: List[str] = [
+# List of responses to when a user calls /play but they are not in any voice channel
+USER_NOT_IN_VOICE_CHANNEL: list[str] = [
     "Play? But where should I perform? I can't find you in any voice channel. 🤔",
     "Hmm, you want me to play, but I can't seem to locate you in any voice channel. Where are you hiding? 😔",
     "Sure, but you'll have to where are you now? I can't seem to find a voice channel with your name in it.",
@@ -144,7 +141,7 @@ USER_NOT_IN_VOICE_CHANNEL: List[str] = [
 ]
 
 # List of responses to when a user calls for a music command but the player is not playing anything yet
-NO_SONG: List[str] = [
+NO_SONG: list[str] = [
     "Oh, there's no music playing at the moment. How about we start the concert with a song of your choice?",
     "Meow... It seems the jukebox is currently taking a cat nap. Want to wake it up with some tuneful requests?",
     "Oopsie-daisy! I don't hear any music playing right now. Did someone press the play button yet?",
@@ -164,7 +161,7 @@ NO_SONG: List[str] = [
 ]
 
 # List of responses to say when Cosette is skipping a song
-SKIPPING_SONGS: List[str] = [
+SKIPPING_SONGS: list[str] = [
     "Skipping to the next melody like a nimble feline!",
     "Meow-ving on to the next tune, let's keep the rhythm going!",
     "Cosette's musical senses have spoken, skipping ahead!",
@@ -190,15 +187,15 @@ SKIPPING_SONGS: List[str] = [
 ]
 
 # List of responses to say when there are no more songs to skip
-NO_MORE_SONGS: List[str] = [
-    "⛔  Oh, you're feeling the skip fever, aren't you? But hold your paws, we've reached the end of the playlist. Time to savor the remaining tunes!",
-    "⛔  Tsk, tsk! Trying to skip into the unknown, are we? Unfortunately, we've come to the end of the line. Let's revel in what's left!",
-    "⛔  Well, well, well, seems like someone can't wait to jump to the next beat! But sorry to disappoint, we've reached the final notes. Enjoy the finale - or you know, queue up more songs!",
-    "⛔  Hmm, something seems amiss. I can't find any more songs to skip. Did they vanish into thin air? Well, how about we sit back, relax, and enjoy the melodies that fill the air?",
-    "⛔  Oh dear, it appears we've hit a musical dead end. I'm scratching my head, wondering where the tunes went. But hey, let's make the most of what's left and savor the rhythm that dances around us!",
-    "⛔  Curiouser and curiouser! The skip button leads me to a musical void. I'm puzzled, but fret not, my friend. We'll revel in the melodies still playing and let the music work its magic!",
-    "⛔  Meow... I'm at a loss! The song skipper is feeling a little shy today, it seems. Perhaps the music wanted to linger a little longer. Let's embrace its choice and soak in the harmonious atmosphere!",
-    "⛔  Well, this is pawplexing! The skip button seems to have gone on a vacation. But worry not, there's still harmony in the air! Enjoy the current groove or add more to the queue!"
+NO_MORE_SONGS: list[str] = [
+    "Oh, you're feeling the skip fever, aren't you? But hold your paws, we've reached the end of the playlist. Time to savor the remaining tunes!",
+    "Tsk, tsk! Trying to skip into the unknown, are we? Unfortunately, we've come to the end of the line. Let's revel in what's left!",
+    "Well, well, well, seems like someone can't wait to jump to the next beat! But sorry to disappoint, we've reached the final notes. Enjoy the finale - or you know, queue up more songs!",
+    "Hmm, something seems amiss. I can't find any more songs to skip. Did they vanish into thin air? Well, how about we sit back, relax, and enjoy the melodies that fill the air?",
+    "Oh dear, it appears we've hit a musical dead end. I'm scratching my head, wondering where the tunes went. But hey, let's make the most of what's left and savor the rhythm that dances around us!",
+    "Curiouser and curiouser! The skip button leads me to a musical void. I'm puzzled, but fret not, my friend. We'll revel in the melodies still playing and let the music work its magic!",
+    "Meow... I'm at a loss! The song skipper is feeling a little shy today, it seems. Perhaps the music wanted to linger a little longer. Let's embrace its choice and soak in the harmonious atmosphere!",
+    "Well, this is pawplexing! The skip button seems to have gone on a vacation. But worry not, there's still harmony in the air! Enjoy the current groove or add more to the queue!"
 ]
 
 # List of responses to say when the /pause command is called
@@ -269,7 +266,7 @@ RESUMING_SONG = [
 ]
 
 # List of responses to say when user calls /resume but the song is already resumed
-SONG_ALREADY_RESUMED: List[str] = [
+SONG_ALREADY_RESUMED: list[str] = [
     "Resume? But the song is already playing! Maybe you're enjoying it so much you forgot it wasn't paused?",
     "Resume? Oh, but there's nothing to resume, silly! The song is already merrily filling the air with its melody.",
     "Resume? I'm a bit confused because the song is already in full swing. It seems you're eager to keep the music going!",
@@ -286,7 +283,7 @@ SONG_ALREADY_RESUMED: List[str] = [
 ]
 
 # List of responses to say when Cosette is asked to disconnect from the voice channel (/stop command)
-LEAVING_VOICE_CHANNEL: List[str] = [
+LEAVING_VOICE_CHANNEL: list[str] = [
     "Oh, already tired of my melodious company? Fine, I'll take my purrfect voice elsewhere!",
     "Leaving so soon? But I was just getting warmed up. Guess I'll have to find another stage to serenade.",
     "Aww, you're breaking my heart. Farewell for now, but remember, my melodies will haunt your dreams! 👻",
@@ -305,7 +302,7 @@ LEAVING_VOICE_CHANNEL: List[str] = [
 ]
 
 # List of responses to say when a user calls the /queue command but the queue itself is empty
-QUEUE_IS_EMPTY: List[str] = [
+QUEUE_IS_EMPTY: list[str] = [
     "Oh, dear! It seems our queue is as empty as a sunny windowsill without a cozy spot. Care to add some tunes and make it lively?",
     "Well, well, well... Our queue is as quiet as a mouse tip-toeing on a fluffy carpet. Shall we fill it up and make some noise?",
     "Oh, my whiskers! The queue looks so empty that even the tumbleweeds are feeling lonely. How about we add some music and liven things up?",
@@ -318,7 +315,7 @@ QUEUE_IS_EMPTY: List[str] = [
 ]
 
 # List of responses to say when a user calls the /roll command
-ROLLING: List[str] = [
+ROLLING: list[str] = [
     "Prepare for an epic roll, like a mighty dragon's breath weapon!",
     "Let's embark on a dice-rolling quest worthy of a heroic adventurer!",
     "In the realm of dice, our fate shall be decided! Let's roll like true adventurers!",
@@ -340,7 +337,7 @@ ROLLING: List[str] = [
 ]
 
 # List of responses to say when Cosette detects a rick roll
-RICK_1ROLLED: List[str] = [
+RICK_1ROLLED: list[str] = [
     "Oh no, you got me with a rick roll! Clever, but I must admit, the song is quite catchy!",
     "Well played, my friend! That rick roll took me by surprise, but I can't help but bop along to the music.",
     "You sneaky human! I should have known better than to process that request. Rick Astley strikes again!",
@@ -361,7 +358,7 @@ RICK_1ROLLED: List[str] = [
 ]
 
 # List of responses to say when a user calls the /stop command, but Cosette is not in a voice channel
-ALREADY_STOPPED: List[str] = [
+ALREADY_STOPPED: list[str] = [
     "Oh, stop? But I'm not even singing in a voice channel right now!",
     "Stop? I'm not even in a voice channel at the moment!",
     "Stop what? I'm not lending my voice to a channel right now!",

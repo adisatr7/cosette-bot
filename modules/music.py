@@ -2,7 +2,6 @@ import nextcord
 import wavelink
 import modules.response_variety as respond
 from nextcord.ext import commands
-from typing import List
 
 
 class Music(commands.Cog):
@@ -22,7 +21,7 @@ class Music(commands.Cog):
 
         # Remembers which text channel the command is executed from
         self.command_channel = interaction.channel
-            
+
         # Do a YouTube search
         query = await wavelink.YouTubeTrack.search(search, return_first=True)
 
@@ -96,7 +95,7 @@ class Music(commands.Cog):
                 await interaction.response.send_message(respond.no_more_songs())
 
         # Exception handling: If the 'queue' object is not initialized
-        # Presumed cause: there are no more songs | TODO: Investigate further!
+        # Presumed cause: there are no more songs
         except nextcord.errors.ApplicationInvokeError as e:
             await interaction.response.send_message(respond.no_more_songs())
 
@@ -354,8 +353,3 @@ class Music(commands.Cog):
         duration += f"{minutes:02d}:{seconds:02d}"
 
         return f"`{duration}`"
-
-
-# Setup the cog
-def setup(bot: commands.Bot):
-    bot.add_cog(Music(bot))
