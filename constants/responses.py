@@ -375,3 +375,34 @@ ALREADY_STOPPED: list[str] = [
     "Stop? I'm sorry to disappoint, but I'm not lending my magical voice to any channel at the moment!",
     "Stop? Oh, I see you're trying to stop the nonexistent music that I'm not playing in a voice channel!",
 ]
+
+# List of responses to say when Cosette connects to a different voice channel
+MOVING_TO_DIFFERENT_VC: list[str] = [
+    "Oh, you want me to sing in a different voice channel? Sure, I'll be right there!",
+    "No worries, I'll join you in your channel!",
+    "Coming to your voice channel to play some tunes!",
+    "Hold on, let me switch over to your channel!",
+    "Sure, I'll move to your voice channel right away!",
+    "I'll make my way to your voice channel in a jiffy!",
+    "Hold on, I'll switch to your voice channel!",
+    "I'm coming to join your voice channel!",
+    "Prepare for my arrival in your voice channel!",
+    "I'll relocate to your voice channel for your listening pleasure!",
+    "Fear not, I'll move to your voice channel in an instant!",
+    "You're lucky I like you! I'll switch to your voice channel, but you better prepare yourself for some amazing tunes!",
+    "I'm feeling generous today. I'll make my way to your voice channel.",
+    "A change of scenery, huh? Alright, I'll move to your voice channel.",
+    "Leaving my cozy voice channel for yours? You better make it worth my while.",
+    "You're pulling me away from my groove, but I'll follow you to your voice channel. Let's see if you can handle my melodies!",
+    "Alright, I'll relocate to your voice channel, but don't blame me if my voice takes your breath away!",
+    "You're in luck! I'm bringing my talents to your voice channel.",
+    "Oh, you want me to sing in a different voice channel? Coming, my adorable audience!",
+    "You're pulling me away from my cozy spot, but for you, my charming listener, I'll switch to your voice channel!",
+    "A change of scenery, my lovely friend? I'm on my way to your voice channel!",
+    "Leaving my cozy corner for you, my delightful companion? I'm on my way.",
+    "I'm on the move, my precious friend!",
+    "You're tugging at my heartstrings, my enchanting fan! I'll follow you to your voice channel.",
+    "Alright, my dear music aficionado, I'm coming to you.",
+    "You're luring me with your charm, my captivating listener! I can't resist performing in your voice channel!",
+    "You've captured my attention. I'm bringing my musical talents to your voice channel!"
+]

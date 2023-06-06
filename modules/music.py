@@ -1,26 +1,31 @@
+from nextcord import ButtonStyle, Color, Embed, Interaction, Message, SlashOption
+from nextcord.errors import ApplicationInvokeError
+from nextcord.ui import View, Button
+from nextcord.ext import commands
 import nextcord
 import wavelink
 import modules.response_variety as respond
-from nextcord.ext import commands
+import api.controllers as api
 
 
 class Music(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot: commands.Bot = bot
-        self.command_channel: nextcord.TextChannel = None
         print("Music cog loaded successfully!")
 
-    # Play command | TODO: Add Spotify support and USE EMBED
+    # Play command | TODO: Add Spotify support
     @nextcord.slash_command(guild_ids=[], description="Summon Cosette and let her work her magic with a YouTube jam")
     async def play(
         self,
-        interaction: nextcord.Interaction,
-        search: str = nextcord.SlashOption(description="Enter the search query or YouTube URL of the song you want to play"),
-        override: bool | None = nextcord.SlashOption(description="Override the current queue and start playing immediately (optional)")
+        interaction: Interaction,
+        search: str = SlashOption(
+            description="Enter the search query or YouTube URL of the song you want to play"),
+        override: bool | None = SlashOption(
+            description="Play the new song immediately, replacing the one curently playing (optional)")
     ) -> None:
 
         # Remembers which text channel the command is executed from
-        self.command_channel = interaction.channel
+        api.set_command_channel(interaction.guild_id, interaction.channel_id)
 
         # Do a YouTube search
         query = await wavelink.YouTubeTrack.search(search, return_first=True)
@@ -43,6 +48,11 @@ class Music(commands.Cog):
         if not interaction.guild.voice_client:
             vc: wavelink.Player = await destination.connect(cls=wavelink.Player)
 
+        # If the user is in another channel, have Cosette move there
+        elif interaction.guild.voice_client.channel != destination:
+            vc: wavelink.Player = await interaction.guild.voice_client.move_to(destination)
+            await interaction.response.send_message(respond.move_to_different_vc())
+
         # Otherwise, stay there
         else:
             vc: wavelink.Player = interaction.guild.voice_client
@@ -58,10 +68,10 @@ class Music(commands.Cog):
             await interaction.response.send_message(respond.add_song_to_queue())
 
             # Prepares an embed message
-            embed: nextcord.Embed = nextcord.Embed(
+            embed: Embed = Embed(
                 title="Song added to queue!",
                 description=vc.current.title,
-                color=nextcord.Color.random()
+                color=Color.random()
             )
             embed.add_field(
                 name="Author:",
@@ -74,11 +84,12 @@ class Music(commands.Cog):
             embed.set_thumbnail(f"https://img.youtube.com/vi/{vc.current.identifier}/default.jpg")
 
             # Sends the embed message
-            await self.command_channel.send(embed=embed)
+            channel = self.bot.get_channel(api.fetch_command_channel(interaction.guild_id))
+            await channel.send(embed=embed)
 
     # Skip command
     @nextcord.slash_command(guild_ids=[], description="Have Cosette to cue up the next melody in line.")
-    async def skip(self, interaction: nextcord.Interaction) -> None:
+    async def skip(self, interaction: Interaction) -> None:
 
         # Initializes Wavelink Player
         vc: wavelink.Player = interaction.guild.voice_client
@@ -96,12 +107,12 @@ class Music(commands.Cog):
 
         # Exception handling: If the 'queue' object is not initialized
         # Presumed cause: there are no more songs
-        except nextcord.errors.ApplicationInvokeError as e:
+        except ApplicationInvokeError as e:
             await interaction.response.send_message(respond.no_more_songs())
 
     # Pause command
     @nextcord.slash_command(guild_ids=[], description="Give Cosette a breather - even music bots need a quick break.")
-    async def pause(self, interaction: nextcord.Interaction) -> None:
+    async def pause(self, interaction: Interaction) -> None:
 
         # Initializes Wavelink Player
         vc: wavelink.Player = interaction.guild.voice_client
@@ -113,12 +124,12 @@ class Music(commands.Cog):
 
                 # Have her tell the user that the song is paused
                 await interaction.response.send_message(respond.pause())
-                
+
                 # Prepares an embed message
-                embed: nextcord.Embed = nextcord.Embed(
+                embed: Embed = Embed(
                     title="Song paused!",
                     description=vc.current.title,
-                    color=nextcord.Color.random()
+                    color=Color.random()
                 )
                 embed.add_field(
                     name="Author:",
@@ -131,7 +142,8 @@ class Music(commands.Cog):
                 embed.set_thumbnail(f"https://img.youtube.com/vi/{vc.current.identifier}/default.jpg")
 
                 # Sends the embed message
-                await self.command_channel.send(embed=embed)
+                channel = self.bot.get_channel(api.fetch_command_channel(interaction.guild_id))
+                await channel.send(embed=embed)
 
             # Otherwise, have her tell the user that she's not playing anything
             else:
@@ -143,7 +155,7 @@ class Music(commands.Cog):
 
     # Resume command
     @nextcord.slash_command(guild_ids=[], description="Get the music flowing again! Cosette's tunes can't stay quiet for long.")
-    async def resume(self, interaction: nextcord.Interaction) -> None:
+    async def resume(self, interaction: Interaction) -> None:
 
         # Initializes Wavelink Player
         vc: wavelink.Player = interaction.guild.voice_client
@@ -159,10 +171,10 @@ class Music(commands.Cog):
                 await interaction.response.send_message(respond.resume_song())
                 
                 # Prepares an embed message
-                embed: nextcord.Embed = nextcord.Embed(
+                embed: Embed = Embed(
                     title="Song resumed!",
                     description=vc.current.title,
-                    color=nextcord.Color.random()
+                    color=Color.random()
                 )
                 embed.add_field(
                     name="Author:",
@@ -175,7 +187,8 @@ class Music(commands.Cog):
                 embed.set_thumbnail(f"https://img.youtube.com/vi/{vc.current.identifier}/default.jpg")
 
                 # Sends the embed message
-                await self.command_channel.send(embed=embed)
+                channel = self.bot.get_channel(api.fetch_command_channel(interaction.guild_id))
+                await channel.send(embed=embed)
 
             # Otherwise, have her tell the user that the song is already resumed
             else:
@@ -187,7 +200,7 @@ class Music(commands.Cog):
 
     # Stop command
     @nextcord.slash_command(guild_ids=[], description="Hush Cosette's melodious purrs, leaving her song unfinished.")
-    async def stop(self, interaction: nextcord.Interaction) -> None:
+    async def stop(self, interaction: Interaction) -> None:
 
         # Initializes Wavelink Player
         vc: wavelink.Player = interaction.guild.voice_client
@@ -204,23 +217,24 @@ class Music(commands.Cog):
                 await vc.queue.clear()
                 
             # Prepares an embed message
-            embed: nextcord.Embed = nextcord.Embed(
+            embed: Embed = Embed(
                 title="Song stopped!",
                 description="Playlist has been cleared!",
-                color=nextcord.Color.random()
+                color=Color.random()
             )
 
             # Sends the embed message
-            await self.command_channel.send(embed=embed)
+            channel = self.bot.get_channel(api.fetch_command_channel(interaction.guild_id))
+            await channel.send(embed=embed)
 
         # Exception handling: If Cosette is not even in a voice channel
-        except nextcord.errors.ApplicationInvokeError as e:
+        except ApplicationInvokeError as e:
 
             pass    # TODO: Have her tease the user
 
     # See queue command
     @nextcord.slash_command(guild_ids=[], description="Peek into Cosette's song queue.")
-    async def queue(self, interaction: nextcord.Interaction) -> None:
+    async def queue(self, interaction: Interaction) -> None:
 
         # Initializes Wavelink Player
         vc: wavelink.Player = interaction.guild.voice_client
@@ -233,7 +247,7 @@ class Music(commands.Cog):
                 # await interaction.response.send_message(respond.show_queue())
 
                 # Setup an embed message
-                embed: nextcord.Embed = nextcord.Embed(title="Current Playlist", color=nextcord.Color.random())
+                embed: Embed = Embed(title="Current Playlist", color=Color.random())
                 embed.set_thumbnail(f"https://img.youtube.com/vi/{vc.current.identifier}/default.jpg")
 
                 # Include the song that is currently playing to the embed message
@@ -283,10 +297,10 @@ class Music(commands.Cog):
     async def on_wavelink_track_start(self, payload: wavelink.TrackEventPayload) -> None:
 
         # Prepares an embed message
-        embed: nextcord.Embed = nextcord.Embed(
+        embed: Embed = Embed(
             title="Now playing:",
             description=payload.player.current.title,
-            color=nextcord.Color.random()
+            color=Color.random()
         )
         embed.add_field(
             name="Author:",
@@ -307,27 +321,60 @@ class Music(commands.Cog):
                 inline=False
             )
 
-        # Sends the embed message
-        await self.command_channel.send(embed=embed)
+        # Creates UI Buttons
+        player_button_view = nextcord.ui.View()
 
-        # Fetch the last 10 messages
-        messages = await self.command_channel.history(limit=10).flatten()  
-        cosette_last_message = None
+        # Pause button
+        async def pause_callback(interaction: Interaction, message: Message) -> None:
+            vc: wavelink.Player = interaction.guild.voice_client
+            global embed, player_button_view
+            message.edit(embed=Embed, view=View)
+        
+        if not payload.player.is_paused():
+            player_button_view.add_item(
+                Button(
+                    style=ButtonStyle.green,
+                    label="Pause",
+                    custom_id="pause",
+                    emoji="⏸"
+                ).callback(await self.pause)
+            )
+        
+        # Resume button
+        else:
+            player_button_view.add_item(
+                Button(
+                    style=ButtonStyle.green,
+                    label="Resume",
+                    custom_id="resume",
+                    emoji="▶"
+                ).callback(await self.resume)
+            )
 
-        # Find which one belongs to Cosette
-        for message in messages:
-            if message.author == self.bot.user:  # Check if the message was sent by the bot (Cosette)
-                cosette_last_message = message
-                break
+        # Stop button
+        player_button_view.add_item(
+            Button(
+                style=ButtonStyle.red,
+                label="Stop",
+                custom_id="stop",
+                emoji="⏹"
+            ).callback(await self.stop)
+        )
 
-        # Add reaction buttons | TODO: Replace reaction with UI View/Button
-        if cosette_last_message:
-            await cosette_last_message.add_reaction("⏸")
-            await cosette_last_message.add_reaction("⏹")
-
-        # Add 'next track' button if there a song is detected in the queue
+        # Skip button (Only if there is a song in the queue)
         if payload.player.queue:
-            await cosette_last_message.add_reaction("⏭")
+            player_button_view.add_item(
+                Button(
+                    style=ButtonStyle.grey,
+                    label="Skip",
+                    custom_id="skip",
+                    emoji="⏭"
+                ).callback(await self.skip)
+            )
+
+        # Sends the embed message
+        channel = self.bot.get_channel(api.fetch_command_channel(payload.player.guild.id))
+        msg: Message = await channel.send(embed=embed, view=player_button_view)
 
     # Converts milliseconds to a time string that is human-readable
     @staticmethod

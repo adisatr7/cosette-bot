@@ -9,8 +9,9 @@ __pycache__/
 .vscode/
 .idea/
 
-# Ignore all folders startin with dot in their names
-.cog_dari_rizky/
+# Ignore files containing sensitive informations
+.env
+*.json
 
 # Ignore log files
 *.log
