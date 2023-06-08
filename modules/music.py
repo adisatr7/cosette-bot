@@ -77,7 +77,7 @@ class Music(commands.Cog):
             # Get the ID of the message where the buttons are attached to
             msg_id, ch_id = api.fetch_message_id_with_buttons(player.guild.id)
             ch = self.bot.get_channel(ch_id)
-            msg = await ch.fetch_message(msg_id) # type: ignore
+            msg = await ch.fetch_message(msg_id)
 
             # Update the buttons
             await msg.edit(embed=msg.embeds[0], view=buttons)
@@ -151,7 +151,7 @@ class Music(commands.Cog):
                 embed.add_field(
                     name="Now playing:",
                     value=f"{ player.current.title } — ({ Music.convert_duration(player.current.duration) })"
-                )FOr map
+                )
 
                 # If there are more songs in the queue
                 if not player.queue.is_empty:
@@ -230,7 +230,7 @@ class Music(commands.Cog):
 
                 # Remove any player buttons from the previous message
                 await self.__remove_player_buttons(player)
-                
+
                 # Pause the player
                 await player.pause()
 
@@ -247,7 +247,7 @@ class Music(commands.Cog):
                 # Sends the embed message
                 channel = self.bot.get_channel(api.fetch_active_channel(interaction.guild_id))
                 msg = await channel.send(embed=embed, view=buttons)
-                
+
                 # Remembers where the last message with buttons is
                 api.set_message_id_with_buttons(player.guild.id, msg.id)
 
