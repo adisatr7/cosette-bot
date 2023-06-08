@@ -85,6 +85,7 @@ class Music(commands.Cog):
             # await self.__remove_player_buttons(player)
 
             # Update the buttons in the previous message
+            self.__remove_player_buttons(player)
             buttons: View = self.__render_player_buttons(player)
 
             # Get the ID of the message where the buttons are attached to
@@ -92,8 +93,9 @@ class Music(commands.Cog):
             ch = self.bot.get_channel(ch_id)
             msg = await ch.fetch_message(msg_id)
 
-            # Update the buttons
-            await msg.edit(embed=msg.embeds[0], view=buttons)
+            # Update the buttons and embed
+            embed = self.__render_embed("Now playing:", player)
+            await msg.edit(embed=embed, view=buttons)
 
             # Prepares an embed message
             embed: Embed = Embed(
@@ -170,11 +172,31 @@ class Music(commands.Cog):
                 # Include the song that is currently playing to the embed message
                 embed.add_field(
                     name="Now playing:",
-                    value=f"{ player.current.title } — ({ Music.convert_duration(player.current.duration) })"
+                    value=f"{ player.current.title } — ({ Music.convert_duration(player.current.duration) })",
+                    inline=False
+                )
+                embed.add_field(
+                    name="Author:",
+                    value=player.current.author
+                )
+                embed.add_field(
+                    name="Duration:",
+                    value=Music.convert_duration(player.current.duration)
+                )
+                embed.add_field(
+                    name="Loop mode:",
+                    value=f"`{api.loop_mode.get(player.guild.id)}`"
+                )
+                embed.add_field(
+                    name="Shuffle mode:",
+                    value="`To be added soon!`"    # f"`{api.shuffle_mode.get(player.guild.id)}`"
                 )
 
                 # If there are more songs in the queue
                 if not player.queue.is_empty:
+
+                    # Remove player buttons that are currently attached to an embed message
+                    await self.__remove_player_buttons(player)
 
                     # Counts how many songs are in the queue
                     song_counter: int = 0
@@ -186,7 +208,7 @@ class Music(commands.Cog):
                     for song in queue:
                         song_counter += 1
                         if song == player.current:
-                            songs += f"\n**{song_counter}. {song.title} — ({ Music.convert_duration(song.duration)})** (Now playing)"
+                            songs += f"\n**{song_counter}. {song.title} — ({ Music.convert_duration(song.duration)}) (Now playing)**"
                         else:
                             songs += f"\n{song_counter}. {song.title} — ({ Music.convert_duration(song.duration)})"
 
@@ -197,8 +219,11 @@ class Music(commands.Cog):
                         inline=False
                     )
 
+                # Prepare new buttons to be attached to this new embed message
+                buttons = self.__render_player_buttons(player)
+
                 # Send the embed message containing queue data to the user
-                await interaction.response.send_message(embed=embed)
+                await interaction.response.send_message(embed=embed, view=buttons)
 
             # If the queue is empty
             else:
@@ -213,18 +238,17 @@ class Music(commands.Cog):
             await interaction.response.send_message(respond.queue_is_empty())
 
     # Automatically have Cosette do something when a song is over
-    @commands.Cog.listener()
-    async def on_wavelink_track_end(self, payload: wavelink.TrackEventPayload) -> None:
-
-        # Removes the buttons from the previous message
-        await self.__remove_player_buttons(payload.player)
-
+    # @commands.Cog.listener()
+    # async def on_wavelink_track_end(self, payload: wavelink.TrackEventPayload) -> None:
 
     # Automatically tells the name of the current song that is playing
     @commands.Cog.listener()
     async def on_wavelink_track_start(self, payload: wavelink.TrackEventPayload) -> None:
 
         player: wavelink.Player = payload.player
+
+        # Removes the buttons from the previous message
+        await self.__remove_player_buttons(payload.player)
 
         # Prepares an embed message
         embed: Embed = self.__render_embed(header="Now playing:", player=player)
@@ -435,7 +459,7 @@ class Music(commands.Cog):
 
         # Creates the view for the buttons
         player_buttons_view = nextcord.ui.View(timeout=player.current.duration / 1000)
-        player_buttons_view.on_timeout = lambda: self.__remove_player_buttons(player)
+        # player_buttons_view.on_timeout = lambda: self.__remove_player_buttons(player)
 
         # Pause button
         if not player.is_paused():
