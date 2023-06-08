@@ -18,14 +18,13 @@ def fetch_guild_ids() -> list[int]:
 
     except Exception as e:
         print("Could not fetch guild IDs. Defaulting to empty list...")
-        print(e)
 
         return []
 
 
-def fetch_command_channel(guild_id: int) -> int:
+def fetch_active_channel(guild_id: int) -> int:
     """
-    Fetches command channel for a guild.
+    Fetches active channel for a guild.
 
     Returns:
         list[]: List of guild IDs
@@ -34,22 +33,22 @@ def fetch_command_channel(guild_id: int) -> int:
         Exception: If the guild ID does not exist in Firestore
     """
     try:
-        print(f"Fetching command channel for guild ID {guild_id}...")
+        print(f"Fetching active channel for guild ID {guild_id}...")
         docs = db.collection("guilds").document(f"{guild_id}").get()
-        print("Fetched command channel successfully!")
+        print("Fetched active channel successfully!")
 
-        return docs.to_dict()["command_channel"]
+        return docs.to_dict()["active_channel"]
 
     except Exception as e:
-        print("Error: Could not fetch command channel!")
-        print(e)
+        print("Error: Could not fetch active channel!")
+        set_active_channel(guild_id, -1)
 
         return -1
 
 
-def set_command_channel(guild_id: int, command_channel: int) -> None:
+def set_active_channel(guild_id: int, active_channel: int) -> None:
     """
-    Sets command channel for a guild.
+    Sets active channel for a guild.
 
     Returns:
         None
@@ -58,15 +57,15 @@ def set_command_channel(guild_id: int, command_channel: int) -> None:
         Exception: If the guild ID does not exist in Firestore
     """
     try:
-        print(f"Setting command channel ID {command_channel} for guild ID {guild_id}")
+        print(f"Setting active channel ID {active_channel} for guild ID {guild_id}")
         db.collection("guilds").document(f"{guild_id}").set(
-            {"command_channel": command_channel}
+            {"active_channel": active_channel},
+            merge=True
         )
-        print("Set command channel successfully!")
+        print(f"Successfully set up channel ID {active_channel} as active channel!")
 
     except Exception as e:
-        print("Could not set command channel...")
-        print(e)
+        print("Could not set active channel...")
 
 
 def fetch_loop_mode(guild_id: int) -> Literal["off", "single", "all"]:
@@ -89,8 +88,8 @@ def fetch_loop_mode(guild_id: int) -> Literal["off", "single", "all"]:
     # Exception handling: Set the loop mode to off by default
     except Exception as e:
         print(f"Could not detect loop mode for guild {guild_id}.")
-        print(e)
         print("Defaulting to off...")
+        set_loop_mode(guild_id, "off")
 
         return "off"
 
@@ -104,10 +103,81 @@ def set_loop_mode(guild_id: int, loop_mode: Literal["off", "single", "all"]) -> 
     """
     try:
         print(f"Setting loop mode for guild {guild_id}...")
-        db.collection("guilds").document(f"{guild_id}").set({"loop_mode": loop_mode})
+        db.collection("guilds").document(f"{guild_id}").set(
+            {"loop_mode": loop_mode},
+            merge=True
+        )
 
-        print(f"Set loop mode for guild {guild_id} successfully!")
+        print(f"Loop mode for guild Id {guild_id} has been successfully set to {loop_mode}!")
 
     except Exception as e:
-        print(f"Failed to set loop mode for guild {guild_id}...")
-        print(e)
+        print(f"Failed to set loop mode for guild {guild_id}!")
+
+
+def fetch_message_id_with_buttons(guild_id: int) -> tuple[int, int]:
+    """
+    Fetches message ID for a guild.
+
+    Returns:
+        int: Message ID
+    """
+    try:
+        print(f"Fetching for message ID for guild {guild_id} where the player buttons are attached to...")
+        doc = db.collection("guilds").document(f"{guild_id}").get()
+
+        # If the document exists, retrieve the message ID
+        message_id: int = doc.to_dict()["message_id_with_buttons"]
+
+        # Also retrieve the active channel
+        active_channel: int = doc.to_dict()["active_channel"]
+
+        # Console log the success message
+        print(f"Player buttons are attached to message ID {message_id} in channel ID {active_channel}!")
+
+        return message_id, active_channel
+
+    # Exception handling: Set the message ID to -1 by default
+    except Exception as e:
+        print(f"Could not detect message ID for guild {guild_id}!")
+
+        return -1
+
+
+def set_message_id_with_buttons(guild_id: int, message_id: int) -> None:
+    """
+    Sets message ID for a guild.
+
+    Returns:
+        None
+    """
+    try:
+        print(f"Attaching player buttons to a message somewhere in guild ID {guild_id}...")
+        db.collection("guilds").document(f"{guild_id}").set(
+            {"message_id_with_buttons": message_id},
+            merge=True
+        )
+
+        print(f"Player buttons for guild ID {guild_id} have been sucessfully attached to message ID {message_id}!")
+
+    except Exception as e:
+        print(f"Failed to set message ID for guild {guild_id}!")
+
+
+def clear_message_id_with_buttons(guild_id: int) -> None:
+    """
+    Clears message ID for a guild.
+
+    Returns:
+        None
+    """
+    try:
+        print(f"Clearing message ID where the player buttons are for guild {guild_id}...")
+        db.collection("guilds").document(f"{guild_id}").set(
+            {"message_id_with_buttons": 0},
+            merge=True
+        )
+
+        print(f"Cleared! Player buttons for guild ID {guild_id} are no longer attached to any message!")
+
+    except Exception as e:
+        print(f"Failed to clear message ID where player buttons are for guild ID {guild_id}!")

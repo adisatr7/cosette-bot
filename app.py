@@ -2,12 +2,9 @@
 import nextcord
 import modules.response_variety as respond
 import wavelink
-import re
 import os
 from dotenv import load_dotenv
-from random import randint
 from nextcord.ext import commands
-from typing import Literal
 from constants.prefixes import COMMAND_PREFIXES
 from modules.music import Music
 from modules.diceroll import DiceRoll
@@ -28,11 +25,12 @@ bot: commands.Bot = commands.Bot(
 bot.add_cog(Music(bot))
 bot.add_cog(DiceRoll(bot))
 
+
 # Setting up wavelink node for Cosette's music player function
 async def on_node():
     node: wavelink.Node = wavelink.Node(
-        uri=os.getenv("WAVELINK_URI"),
-        password=os.getenv("WAVELINK_PASSWORD")
+        uri=str(os.getenv("WAVELINK_URI")),
+        password=str(os.getenv("WAVELINK_PASSWORD"))
     )
     await wavelink.NodePool.connect(client=bot, nodes=[node])
     wavelink.Player.autoplay = True
@@ -69,7 +67,7 @@ async def on_message(message: nextcord.Message or None) -> None:
         print(f"{message.author}: \"{message.content}\"")
 
         # Have her respond to the chat
-        await message.channel.send(respond.respond_to_ment)
+        await message.channel.send(respond.respond_to_mention())
 
 
 # Keep Cosette up and running by looping this whole process

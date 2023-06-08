@@ -406,3 +406,17 @@ MOVING_TO_DIFFERENT_VC: list[str] = [
     "You're luring me with your charm, my captivating listener! I can't resist performing in your voice channel!",
     "You've captured my attention. I'm bringing my musical talents to your voice channel!"
 ]
+
+# List of responses to say when the final song in the queue is over
+FINAL_SONG_OVER: list[str] = [
+    "Well, it seems we've reached the end of the queue. But fear not, my delightful friend! We can always add more songs to keep the music flowing. What would you like to hear next?",
+    "Bravo! We've completed the final song in the queue. But don't worry, my music-loving companion! We can continue this melodic journey by queuing up more delightful tunes. What's your next musical desire?",
+    "Applause, applause! We've reached the end of our current playlist. However, the show doesn't end here, my dear listener! Let's keep the rhythm alive by adding more songs to the queue. What shall we play next?",
+    "The final note fades away, leaving us craving for more. But fret not, my wonderful friend! We can keep the music playing by queuing up additional songs. What melody shall we embark on next?",
+    "The last song echoes through the air, leaving a void that yearns to be filled. Luckily, my marvelous companion, we have the power to create more musical magic! Let's queue up another enchanting piece. What's your choice?",
+    "And there it goes, the final song bidding us farewell. But my friend, the music never truly stops! We can continue this harmonious journey by adding new songs to the queue. What's your wish for the next melody?",
+    "The final chord fades away, but the symphony doesn't have to end here. Together, my amazing listener, we can keep the rhythm going! Let's queue up another captivating song. What genre or artist shall we explore next?",
+    "Brilliant performance, if I do say so myself! But alas, the final song has reached its conclusion. What song shall we add to the queue to keep the groove alive?",
+    "The last refrain echoes, signaling the end of our current playlist. But don't despair, my incredible companion! We can curate a new collection of melodies by adding more songs to the queue. What's your preferred musical flavor?",
+    "The final melody fades away, leaving a craving for more musical delight. Fortunately, my extraordinary listener, we can fulfill that craving by queuing up another captivating song. What rhythm or beat shall we explore next?"
+]

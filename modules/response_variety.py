@@ -343,3 +343,21 @@ def move_to_different_vc() -> str:
     selected_response = responses.MOVING_TO_DIFFERENT_VC[random_index]
 
     return selected_response
+
+def final_song_over() -> str:
+    """
+    Selects a random response from a list for when Cosette
+    is about to move to a different voice channel while she's
+    already in another voice channel.
+
+    Returns:
+        str: Randomly selected response.
+    """
+
+    # Select a random index within the range of responses list
+    random_index = randint(0, len(responses.FINAL_SONG_OVER) - 1)
+
+    # Retrieve the greeting at the random index
+    selected_response = responses.FINAL_SONG_OVER[random_index]
+
+    return selected_response

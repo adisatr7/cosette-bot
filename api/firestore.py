@@ -6,7 +6,7 @@ service_account_key_path = "./api/firebase-adminsdk.json"
 
 # Initialize the Firebase Admin SDK
 cred = credentials.Certificate(service_account_key_path)
-app: firebase_admin.App = firebase_admin.initialize_app(cred)
+app = firebase_admin.initialize_app(cred)
 
 # Export the database client so it can by other classes/files
 db = firestore.client(app)
