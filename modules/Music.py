@@ -1,6 +1,7 @@
-from nextcord import ButtonStyle, Color, Embed, Interaction, Message, TextChannel, SlashOption
+from cProfile import label
+from nextcord import ButtonStyle, Color, Embed, Interaction, Message, TextChannel, SlashOption, SelectOption
 from nextcord.errors import ApplicationInvokeError
-from nextcord.ui import View, Button
+from nextcord.ui import Button, Select, View
 from nextcord.ext import commands
 import nextcord
 import wavelink
@@ -118,10 +119,10 @@ class Music(commands.Cog):
 
         # EXPERIMENTAL
         # api.queue_controller.set(interaction.guild_id, player.queue)
-        api.queue_controller.clear(interaction.guild_id)
-        debug: wavelink.Queue = api.queue_controller.get(interaction.guild_id)
-        print(f"DEBUG: Real queue output test: {player.queue}")
-        print(f"DEBUG: Firestore queue test: {debug}")
+        # api.queue_controller.clear(interaction.guild_id)
+        # debug: wavelink.Queue = api.queue_controller.get(interaction.guild_id)
+        # print(f"DEBUG: Real queue output test: {player.queue}")
+        # print(f"DEBUG: Firestore queue test: {debug}")
 
     # Skip command
     @nextcord.slash_command(guild_ids=[], description="Have Cosette to cue up the next melody in line.")
@@ -184,7 +185,10 @@ class Music(commands.Cog):
 
                     for song in queue:
                         song_counter += 1
-                        songs += f"\n{song_counter}. {song.title} — ({ Music.convert_duration(song.duration)})"
+                        if song == player.current:
+                            songs += f"\n**{song_counter}. {song.title} — ({ Music.convert_duration(song.duration)})** (Now playing)"
+                        else:
+                            songs += f"\n{song_counter}. {song.title} — ({ Music.convert_duration(song.duration)})"
 
                     # Include the list of queued songs to the embed message
                     embed.add_field(
@@ -215,8 +219,6 @@ class Music(commands.Cog):
         # Removes the buttons from the previous message
         await self.__remove_player_buttons(payload.player)
 
-        # TODO: Implement loop mode
-        pass
 
     # Automatically tells the name of the current song that is playing
     @commands.Cog.listener()
@@ -409,17 +411,22 @@ class Music(commands.Cog):
             name="Loop mode:",
             value=f"`{api.loop_mode.get(player.guild.id)}`"
         )
+        embed.add_field(
+            name="Shuffle mode:",
+            value="`To be added soon!`"    # f"`{api.shuffle_mode.get(player.guild.id)}`"
+        )
         embed.set_thumbnail(f"https://img.youtube.com/vi/{track.identifier}/default.jpg")
 
         # If there is a song in the queue, display the next song title
         try:
-            embed.add_field(
-                name="Next:",
-                value=f"{player.queue[track.position + 1].title} ({ Music.convert_duration(player.queue[0].duration) })",
-                inline=False
-            )
+            if not player.queue.is_empty:
+                embed.add_field(
+                    name="Next:",
+                    value=f"{player.queue[0].title} ({ Music.convert_duration(player.queue[0].duration) })",
+                    inline=False
+                )
 
-        except IndexError as e:
+        except IndexError or wavelink.QueueEmpty as e:
             pass
 
         return embed
@@ -427,7 +434,8 @@ class Music(commands.Cog):
     def __render_player_buttons(self, player: wavelink.Player) -> View:
 
         # Creates the view for the buttons
-        player_buttons_view = nextcord.ui.View()
+        player_buttons_view = nextcord.ui.View(timeout=player.current.duration / 1000)
+        player_buttons_view.on_timeout = lambda: self.__remove_player_buttons(player)
 
         # Pause button
         if not player.is_paused():
@@ -463,13 +471,25 @@ class Music(commands.Cog):
         stop_button = Button(
             style=ButtonStyle.red,
             label="Stop",
-            custom_id="stop",
+            custom_id="stop"
         )
         stop_button.callback = self.__stop_callback
+        player_buttons_view.add_item(stop_button)
+
+        loop_settings = Select(
+            placeholder="Loop settings",
+            options=[
+                SelectOption(label="off", value="off", description="Disable looping"),
+                SelectOption(label="single", value="single", description="Set the current song on loop"),
+                SelectOption(label="all", value="all", description="Set the whole queue on loop")
+            ], 
+            min_values=1,
+            max_values=1
+        )
+        loop_settings.callback = lambda interaction: self.__loop_settings_callback(interaction, loop_settings)
+        player_buttons_view.add_item(loop_settings)
 
         # TODO: Loop button, jump button, shuffle button
-
-        player_buttons_view.add_item(stop_button)
 
         return player_buttons_view
 
@@ -477,7 +497,7 @@ class Music(commands.Cog):
 
         # Fetch the message ID & channel ID where the buttons are attached to from Firestore
         msg_id, channel_id = api.message_buttons.get(player.guild.id)
-        
+
         # If there is a message ID
         if msg_id > 0:
 
@@ -492,6 +512,37 @@ class Music(commands.Cog):
 
             # Clear the message ID from Firestore
             api.message_buttons.clear(player.guild.id)
+
+    async def __loop_settings_callback(self, interaction: Interaction, dropdown: Select) -> None:
+        """Handles the loop settings."""
+
+        # Initializes Wavelink Player
+        player: wavelink.Player = interaction.guild.voice_client
+
+        # If the user selects "off"
+        if dropdown.values[0] == "off":
+            player.queue.loop = False
+            player.queue.loop_all = False
+            api.loop_mode.set(player.guild.id, "off")
+
+        # If the user selects "single"
+        elif dropdown.values[0] == "single":
+            player.queue.loop = True
+            player.queue.loop_all = False
+            api.loop_mode.set(player.guild.id, "single")
+
+        # If the user selects "all"
+        elif dropdown.values[0] == "all":
+            player.queue.loop = False
+            player.queue.loop_all = True    
+            api.loop_mode.set(player.guild.id, "all")
+
+        # Update the buttons and embed
+        self.__remove_player_buttons(player)
+
+        embed = self.__render_embed("Now playing:", player)
+        buttons = self.__render_player_buttons(player)
+        await interaction.message.edit(embed=embed, view=buttons)
 
     # Converts milliseconds to a time string that is human-readable
     @staticmethod
