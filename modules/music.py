@@ -61,7 +61,15 @@ class Music(commands.Cog):
         # If the queue is empty and the player is not playing, have Cosette play the song now
         if override or not player.is_playing():
             await player.play(query)
+            if player.is_paused():
+                await player.pause()
             await interaction.response.send_message(respond.starts_playing_a_song())
+
+            # Remembers where the last buttons are attached to
+            api.set_message_id_with_buttons(interaction.guild_id, interaction.message.id)
+
+            # Remove any player buttons from the previous message
+            await self.__remove_player_buttons(player)
 
         # Otherwise, add the song to queue
         elif not override:
@@ -456,17 +464,20 @@ class Music(commands.Cog):
         # Fetch the message ID & channel ID where the buttons are attached to from Firestore
         msg_id, channel_id = api.fetch_message_id_with_buttons(player.guild.id)
 
-        # Fetch the channel where the buttons are attached to
-        channel: TextChannel = self.bot.get_channel(channel_id)
+        # If there is a message ID
+        if msg_id > 0:
 
-        # Fetch the message where the buttons are attached to
-        msg: Message = await channel.fetch_message(msg_id)
+            # Fetch the channel where the buttons are attached to
+            channel: TextChannel = self.bot.get_channel(channel_id)
 
-        # Update the buttons
-        await msg.edit(embed=msg.embeds[0], view=None)
+            # Fetch the message where the buttons are attached to
+            msg: Message = await channel.fetch_message(msg_id)
 
-        # Clear the message ID from Firestore
-        api.clear_message_id_with_buttons(player.guild.id)
+            # Update the buttons
+            await msg.edit(embed=msg.embeds[0], view=None)
+
+            # Clear the message ID from Firestore
+            api.clear_message_id_with_buttons(player.guild.id)
 
     # Converts milliseconds to a time string that is human-readable
     @staticmethod
