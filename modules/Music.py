@@ -53,8 +53,8 @@ class Music(commands.Cog):
         # If the user is in another channel, have Cosette move there
         elif interaction.guild.voice_client.channel != destination:
             player: wavelink.Player = await interaction.guild.voice_client.move_to(destination)
-            await interaction.response.send_message(respond.move_to_different_player())
-
+            await interaction.response.send_message(respond.move_to_different_vc())
+            
         # Otherwise, stay there
         else:
             player: wavelink.Player = interaction.guild.voice_client
@@ -72,7 +72,8 @@ class Music(commands.Cog):
             api.active_channel.set(guild_id, channel_id)
 
             # Remove any player buttons from the previous message
-            await self.__remove_player_buttons(player)
+            if override:
+                await self.__remove_player_buttons(player)
 
         # Otherwise, add the song to queue
         elif not override:
@@ -114,6 +115,13 @@ class Music(commands.Cog):
 
             # Sends the embed message
             await interaction.channel.send(embed=embed)
+
+        # EXPERIMENTAL
+        # api.queue_controller.set(interaction.guild_id, player.queue)
+        api.queue_controller.clear(interaction.guild_id)
+        debug: wavelink.Queue = api.queue_controller.get(interaction.guild_id)
+        print(f"DEBUG: Real queue output test: {player.queue}")
+        print(f"DEBUG: Firestore queue test: {debug}")
 
     # Skip command
     @nextcord.slash_command(guild_ids=[], description="Have Cosette to cue up the next melody in line.")
@@ -469,8 +477,7 @@ class Music(commands.Cog):
 
         # Fetch the message ID & channel ID where the buttons are attached to from Firestore
         msg_id, channel_id = api.message_buttons.get(player.guild.id)
-        print(f"Debug: __remove_player_button MSG ID: {msg_id} | CHANNEL ID: {channel_id}")
-
+        
         # If there is a message ID
         if msg_id > 0:
 
