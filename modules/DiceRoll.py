@@ -1,6 +1,6 @@
 import re
 import nextcord
-import modules.response_variety as respond
+import modules.ResponseVariety as respond
 from nextcord.ext import commands
 from random import randint
 from typing import Literal

@@ -1,13 +1,13 @@
 # Import necessary libraries
 import nextcord
-import modules.response_variety as respond
+import modules.ResponseVariety as respond
 import wavelink
 import os
 from dotenv import load_dotenv
 from nextcord.ext import commands
 from constants.prefixes import COMMAND_PREFIXES
-from modules.music import Music
-from modules.diceroll import DiceRoll
+from modules.Music import Music
+from modules.DiceRoll import DiceRoll
 
 
 # Declare Cosette's permissions

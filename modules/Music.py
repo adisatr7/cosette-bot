@@ -4,7 +4,7 @@ from nextcord.ui import View, Button
 from nextcord.ext import commands
 import nextcord
 import wavelink
-import modules.response_variety as respond
+import modules.ResponseVariety as respond
 import api.controllers as api
 
 
@@ -26,10 +26,11 @@ class Music(commands.Cog):
         print(f"User {interaction.user.display_name} of guild ID {interaction.guild_id} called /play from channel ID {interaction.channel_id}")
 
         # Remembers which text channel the command is executed from
-        api.set_active_channel(interaction.guild_id, interaction.channel_id)
+        api.active_channel.set(interaction.guild_id, interaction.channel_id)
 
         # Do a YouTube search
         query = await wavelink.YouTubeTrack.search(search, return_first=True)
+        print(f"Searching for song {query.title} with ID {query.identifier}")
 
         # Set the target voice channel where the user is in
         try:
@@ -63,10 +64,12 @@ class Music(commands.Cog):
             await player.play(query)
             if player.is_paused():
                 await player.pause()
-            await interaction.response.send_message(respond.starts_playing_a_song())
+            msg: Message = await interaction.response.send_message(respond.starts_playing_a_song())
 
-            # Remembers where the last buttons are attached to
-            api.set_message_id_with_buttons(interaction.guild_id, interaction.message.id)
+            # Remembers where active channel is
+            guild_id = interaction.guild_id
+            channel_id = interaction.channel_id
+            api.active_channel.set(guild_id, channel_id)
 
             # Remove any player buttons from the previous message
             await self.__remove_player_buttons(player)
@@ -83,7 +86,7 @@ class Music(commands.Cog):
             buttons: View = self.__render_player_buttons(player)
 
             # Get the ID of the message where the buttons are attached to
-            msg_id, ch_id = api.fetch_message_id_with_buttons(player.guild.id)
+            msg_id, ch_id = api.message_buttons.get(interaction.guild_id)
             ch = self.bot.get_channel(ch_id)
             msg = await ch.fetch_message(msg_id)
 
@@ -197,25 +200,6 @@ class Music(commands.Cog):
             # Have Cosette tells the user that she's not playing anything at the moment
             await interaction.response.send_message(respond.queue_is_empty())
 
-    # Automatically tells the name of the current song that is playing
-    @commands.Cog.listener()
-    async def on_wavelink_track_start(self, payload: wavelink.TrackEventPayload) -> None:
-
-        player: wavelink.PLayer = payload.player
-
-        # Prepares an embed message
-        embed: Embed = self.__render_embed(header="Now playing:", player=player)
-
-        # Initializes player buttons
-        buttons = self.__render_player_buttons(player=player)
-
-        # Sends the embed message
-        channel: TextChannel = self.bot.get_channel(api.fetch_active_channel(player.guild.id))
-        msg: Message = await channel.send(embed=embed, view=buttons)
-
-        # Remembers where the last message with buttons is
-        api.set_message_id_with_buttons(player.guild.id, msg.id)
-
     # Automatically have Cosette do something when a song is over
     @commands.Cog.listener()
     async def on_wavelink_track_end(self, payload: wavelink.TrackEventPayload) -> None:
@@ -225,6 +209,26 @@ class Music(commands.Cog):
 
         # TODO: Implement loop mode
         pass
+
+    # Automatically tells the name of the current song that is playing
+    @commands.Cog.listener()
+    async def on_wavelink_track_start(self, payload: wavelink.TrackEventPayload) -> None:
+
+        player: wavelink.Player = payload.player
+
+        # Prepares an embed message
+        embed: Embed = self.__render_embed(header="Now playing:", player=player)
+
+        # Initializes player buttons
+        buttons = self.__render_player_buttons(player=player)
+
+        # Sends the embed message
+        channel_id: int = api.active_channel.get(player.guild.id)
+        channel: TextChannel = self.bot.get_channel(channel_id)
+        msg: Message = await channel.send(embed=embed, view=buttons)
+
+        # Remembers where the last message with buttons is
+        api.message_buttons.set(player.guild.id, msg.id)
 
     async def __pause_callback(self, interaction: Interaction, reaction: bool = False) -> None:
         """Pauses the current song."""
@@ -253,11 +257,11 @@ class Music(commands.Cog):
                 buttons: View = self.__render_player_buttons(player)
 
                 # Sends the embed message
-                channel = self.bot.get_channel(api.fetch_active_channel(interaction.guild_id))
+                channel = self.bot.get_channel(api.active_channel.get(interaction.guild_id))
                 msg = await channel.send(embed=embed, view=buttons)
 
                 # Remembers where the last message with buttons is
-                api.set_message_id_with_buttons(player.guild.id, msg.id)
+                api.message_buttons.set(interaction.guild_id, msg.id)
 
             # Otherwise, have her tell the user that she's not playing anything
             else:
@@ -293,11 +297,12 @@ class Music(commands.Cog):
                 buttons = self.__render_player_buttons(player)
 
                 # Sends the embed message
-                channel = self.bot.get_channel(api.fetch_active_channel(interaction.guild_id))
+                channel_id: int = api.active_channel.get(interaction.guild_id)  
+                channel = self.bot.get_channel(channel_id)
                 msg = await channel.send(embed=embed, view=buttons)
 
                 # Remembers where the last message with buttons is
-                api.set_message_id_with_buttons(player.guild.id, msg.id)
+                api.message_buttons.set(interaction.guild_id, msg.id)
 
             # Otherwise, have her tell the user that the song is already resumed
             else:
@@ -338,11 +343,12 @@ class Music(commands.Cog):
             )
 
             # Sends the embed message
-            channel: TextChannel = self.bot.get_channel(api.fetch_active_channel(interaction.guild_id))
+            channel_id: int = api.active_channel.get(interaction.guild_id)
+            channel: TextChannel = self.bot.get_channel(channel_id)
             msg: TextChannel = await channel.send(embed=embed)
 
             # Remembers where the last message with buttons is
-            api.set_message_id_with_buttons(player.guild.id, msg.id)
+            api.message_buttons.set(interaction.guild_id, msg.id)
 
         # Exception handling: If Cosette is not even in a voice channel
         except ApplicationInvokeError as e:
@@ -393,7 +399,7 @@ class Music(commands.Cog):
         )
         embed.add_field(
             name="Loop mode:",
-            value=f"`{api.fetch_loop_mode(player.guild.id)}`"
+            value=f"`{api.loop_mode.get(player.guild.id)}`"
         )
         embed.set_thumbnail(f"https://img.youtube.com/vi/{track.identifier}/default.jpg")
 
@@ -462,7 +468,8 @@ class Music(commands.Cog):
     async def __remove_player_buttons(self, player: wavelink.Player) -> None:
 
         # Fetch the message ID & channel ID where the buttons are attached to from Firestore
-        msg_id, channel_id = api.fetch_message_id_with_buttons(player.guild.id)
+        msg_id, channel_id = api.message_buttons.get(player.guild.id)
+        print(f"Debug: __remove_player_button MSG ID: {msg_id} | CHANNEL ID: {channel_id}")
 
         # If there is a message ID
         if msg_id > 0:
@@ -477,7 +484,7 @@ class Music(commands.Cog):
             await msg.edit(embed=msg.embeds[0], view=None)
 
             # Clear the message ID from Firestore
-            api.clear_message_id_with_buttons(player.guild.id)
+            api.message_buttons.clear(player.guild.id)
 
     # Converts milliseconds to a time string that is human-readable
     @staticmethod
