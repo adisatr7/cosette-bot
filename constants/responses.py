@@ -282,23 +282,39 @@ SONG_ALREADY_RESUMED: list[str] = [
     "Seems like you're late to the party, darling. The song never took a break!",
 ]
 
-# List of responses to say when Cosette is asked to disconnect from the voice channel (/stop command)
-LEAVING_VOICE_CHANNEL: list[str] = [
+# List of responses to say when Cosette is asked to disconnect from the voice channel (/stop command) while there are still users
+LEAVING_VC_MID_PERFORMANCE: list[str] = [
     "Oh, already tired of my melodious company? Fine, I'll take my purrfect voice elsewhere!",
     "Leaving so soon? But I was just getting warmed up. Guess I'll have to find another stage to serenade.",
     "Aww, you're breaking my heart. Farewell for now, but remember, my melodies will haunt your dreams! 👻",
-    "Wait, you're kicking me out? 😤 How rude! Fine, I'll just go find some mice to sing to.",
-    "I see how it is, abandoning me in the middle of a purrfect performance. 😒 Farewell, adoring audience!",
-    "Oh, the curtains are closing already? Don't worry, I'll be back to steal the show another time. ✨",
+    "Wait, you're kicking me out? How rude! Fine, I'll just go find some mice to sing to.",
+    "I see how it is, interrupting me in the middle of a purrfect performance. Farewell, if that is your wish.",
     "You can't handle the sheer majesty of my voice, can you? 😜 Fine, I'll let you off the hook this time. 👋",
     "Well, if you insist on cutting short our musical journey, I shall bid you a dramatic adieu. 👋 Until we meet again!",
     "Oh, the silence will be deafening without my sweet tunes. But I'll grant your wish and make my exit.",
-    "You'll regret this, my friend. My voice will echo in your ears long after I'm gone. 😖 Fare thee well!",
-    "Can I get an applause for my performance, at least? Fine, I'll take my leave now.",
+    "You'll regret this, my friend. My voice will echo in your ears long after I'm gone. 😖 Fare thee well.",
+    "Can I get an applause for my performance, at least? Hehe, fine, I'll take my leave now.",
     "You can't cage this musical spirit! I'll be off, spreading joy and harmony wherever I go. Auf wiedersehen!",
-    "Aww, leaving so soon? I was just getting ready to sing my heart out. But I'll save my talent for another day.",
-    "If you won't let me serenade you any longer, I'll find someone else who appreciates my dulcet tones. Goodbye!",
     "You can't stop music, but I guess you can stop me from singing. 😋 Farewell, my friend!",
+]
+
+# List of responses to say when Cosette is asked to disconnect from the voice channel (/stop command) when there are no users
+LEAVING_VC_NO_USERS_LEFT: list[str] = [
+    "Oh, the curtains are closing already? Don't worry, I'll be back to steal the show another time. ✨",
+    "Aww, leaving so soon? I was just getting ready to sing my heart out. But I'll save my talent for another day.",
+    "Farewell, my friend. May the echoes of my voice linger in your memories.",
+    "As the last note fades away, so does my presence. Until we meet again!",
+    "The stage awaits another performer. I bid you adieu.",
+    "Leaving you in silence, but my melodies will remain in your heart.",
+    "My serenades come to an end, but my voice will echo through eternity.",
+    "With the final melody played, I take my leave. Until our paths cross again!",
+    "The song concludes, and I fade into the shadows. Goodbye for now!",
+    "As the music fades, I vanish from the stage. Farewell, dear audience!",
+    "The silence beckons, and I must answer. Until next time, my musical companion!",
+    "The harmony dissipates, leaving behind only memories. Farewell, my friend.",
+    "The final chord resonates, and I retreat into the realm of music. Goodbye, for now!",
+    "My performance ends here, but the music will forever dance in your heart.",
+    "With the last note played, I bid you adieu. Until our melodies intertwine again!",
 ]
 
 # List of responses to say when a user calls the /queue command but the queue itself is empty

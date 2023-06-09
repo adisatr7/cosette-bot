@@ -1,4 +1,5 @@
 from cProfile import label
+from discord import ChannelType, Member
 from nextcord import ButtonStyle, Color, Embed, Interaction, Message, TextChannel, SlashOption, SelectOption
 from nextcord.errors import ApplicationInvokeError
 from nextcord.ui import Button, Select, View
@@ -303,7 +304,7 @@ class Music(commands.Cog):
 
         # Exception handler: When the bot is not in a voice channel
         except Exception as e:
-            await interaction.response.send_message(respond.no_song())
+            await interaction.response.send_message(respond.no_song_playing())
 
     async def __resume_callback(self, interaction: Interaction, reaction: bool = False) -> None:
 
@@ -346,7 +347,7 @@ class Music(commands.Cog):
         # Exception handler: When the bot is not in a voice channel
         except Exception as e:
             print("Failed: There is no song to begin with!")
-            await interaction.response.send_message(respond.no_song())
+            await interaction.response.send_message(respond.no_song_playing())
 
     async def __stop_callback(self, interaction: Interaction, reaction: bool = False) -> None:
         """Stops the current song and clears the queue."""
@@ -362,8 +363,17 @@ class Music(commands.Cog):
             await player.disconnect()
 
             # Have Cosette tells the user a message as she leaves the voice channel
-            # if reaction:
-            await interaction.response.send_message(respond.leave_voice_channel())
+            vc_members: list[Member] = interaction.user.voice.channel.members)
+
+            # If there are more than 1 users in the voice channel
+            if len(vc_members) > 1:
+                # Have Cosette expresses disappointment, sadness, or annoyance
+                await interaction.response.send_message(respond.leave_vc_mid_performance())
+
+            # If she's the only one left in the voice channel
+            else:
+                # Have Cosette thanks the user for having her
+                await interaction.response.send_message(respond.leave_vc_no_users())
 
             # Have Cosette clears the music player queue
             # if not player.queue.is_empty:

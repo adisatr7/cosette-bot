@@ -107,7 +107,7 @@ def user_not_in_voice_channel() -> str:
     return selected_response
 
 
-def no_song() -> str:
+def no_song_playing() -> str:
     """
     Selects a random response from a list for when a user
     calls a music command but Cosette is not even playing
@@ -234,7 +234,7 @@ def song_already_resumed() -> str:
     return selected_response
 
 
-def leave_voice_channel() -> str:
+def leave_vc_mid_performance() -> str:
     """
     Selects a random response from a list for when the
     user calls for /stop command, in which Cosette
@@ -245,10 +245,31 @@ def leave_voice_channel() -> str:
     """
 
     # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.LEAVING_VOICE_CHANNEL) - 1)
+    random_index = randint(0, len(responses.LEAVING_VC_MID_PERFORMANCE) - 1)
 
     # Retrieve the greeting at the random index
-    selected_response = responses.LEAVING_VOICE_CHANNEL[random_index]
+    selected_response = responses.LEAVING_VC_MID_PERFORMANCE[random_index]
+
+    return selected_response
+
+
+def leave_vc_no_users() -> str:
+    """
+    Selects a random response from a list for when the
+    user calls for /stop command, in which Cosette
+    will leave the voice channel because there are no
+    users left in the voice channel.
+
+    Returns:
+        str: Randomly selected response.
+    """
+
+    # Select a random index within the range of responses list
+    random_index = randint(
+        0, len(responses.LEAVING_VC_NO_USERS_LEFT) - 1)
+
+    # Retrieve the greeting at the random index
+    selected_response = responses.LEAVING_VC_NO_USERS_LEFT[random_index]
 
     return selected_response
 
