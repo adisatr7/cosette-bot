@@ -56,7 +56,7 @@ class Music(commands.Cog):
         elif interaction.guild.voice_client.channel != destination:
             player: wavelink.Player = await interaction.guild.voice_client.move_to(destination)
             await interaction.response.send_message(respond.move_to_different_vc())
-            
+
         # Otherwise, stay there
         else:
             player: wavelink.Player = interaction.guild.voice_client
@@ -86,7 +86,7 @@ class Music(commands.Cog):
             # await self.__remove_player_buttons(player)
 
             # Update the buttons in the previous message
-            self.__remove_player_buttons(player)
+            await self.__remove_player_buttons(player)
             buttons: View = self.__render_player_buttons(player)
 
             # Get the ID of the message where the buttons are attached to
@@ -332,7 +332,7 @@ class Music(commands.Cog):
                 buttons = self.__render_player_buttons(player)
 
                 # Sends the embed message
-                channel_id: int = api.active_channel.get(interaction.guild_id)  
+                channel_id: int = api.active_channel.get(interaction.guild_id)
                 channel = self.bot.get_channel(channel_id)
                 msg = await channel.send(embed=embed, view=buttons)
 
@@ -363,7 +363,7 @@ class Music(commands.Cog):
             await player.disconnect()
 
             # Have Cosette tells the user a message as she leaves the voice channel
-            vc_members: list[Member] = interaction.user.voice.channel.members)
+            vc_members: list[Member] = interaction.user.voice.channel.members
 
             # If there are more than 1 users in the voice channel
             if len(vc_members) > 1:
@@ -516,7 +516,7 @@ class Music(commands.Cog):
                 SelectOption(label="off", value="off", description="Disable looping"),
                 SelectOption(label="single", value="single", description="Set the current song on loop"),
                 SelectOption(label="all", value="all", description="Set the whole queue on loop")
-            ], 
+            ],
             min_values=1,
             max_values=1
         )
@@ -568,11 +568,11 @@ class Music(commands.Cog):
         # If the user selects "all"
         elif dropdown.values[0] == "all":
             player.queue.loop = False
-            player.queue.loop_all = True    
+            player.queue.loop_all = True
             api.loop_mode.set(player.guild.id, "all")
 
         # Update the buttons and embed
-        self.__remove_player_buttons(player)
+        await self.__remove_player_buttons(player)
 
         embed = self.__render_embed("Now playing:", player)
         buttons = self.__render_player_buttons(player)

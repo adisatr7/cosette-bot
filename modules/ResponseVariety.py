@@ -55,8 +55,8 @@ def respond_to_mention() -> str:
 
 def starts_playing_a_song() -> str:
     """
-    Selects a random response from a list for when when a user starts playing a 
-    song for the first time.
+    Selects a random response from a list for when when a user
+    starts playing a song for the first time.
 
     Returns:
         str: Randomly selected response.
@@ -218,7 +218,7 @@ def resume_song() -> str:
 
 def song_already_resumed() -> str:
     """
-    Selects a random response from a list for when the 
+    Selects a random response from a list for when the
     user calls for /resume but the music is already resumed.
 
     Returns:

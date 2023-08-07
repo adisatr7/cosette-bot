@@ -59,7 +59,7 @@ class QueueController:
         db.collection("guilds").document(f"{guild_id}").update({"queue": DELETE_FIELD})
 
         # except Exception as e:
-            # print(f"Failed to clear queue for guild {guild_id}!")
+        #     print(f"Failed to clear queue for guild {guild_id}!")
 
     # def find(self, guild_id: int, position: int) -> YouTubeTrack:
     #     """
