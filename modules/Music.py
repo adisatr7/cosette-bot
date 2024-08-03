@@ -38,7 +38,7 @@ class Music(commands.Cog):
 
         # Do a YouTube search
         query = await wavelink.Playable.search(search_keyword)
-        print(f"Searching for song {query.title} with ID {query.identifier}")
+        print(f"Searching for song {query[0].title} with ID {query[0].identifier}")
 
         # Set the target voice channel where the user is in
         try:
@@ -47,10 +47,8 @@ class Music(commands.Cog):
         # Exception handler: If the user is not in a voice channel
         # TODO: Test what happens if the user is in a voice channel that she has no permission to join
         except AttributeError as e:
-
             # Have Cosette respond to them via chat
             await ctx.response.send_message(respond.user_not_in_voice_channel())
-
             # End the function early
             return
 
@@ -68,9 +66,9 @@ class Music(commands.Cog):
             player: wavelink.Player = ctx.guild.voice_client
 
         # If the queue is empty and the player is not playing, have Cosette play the song now
-        if override or not player.is_playing():
-            await player.play(query)
-            if player.is_paused():
+        if override or not player.playing:
+            await player.play(query[0])
+            if player.paused:
                 await player.pause()
             msg: Message = await ctx.response.send_message(respond.starts_playing_a_song())
 
@@ -85,7 +83,7 @@ class Music(commands.Cog):
 
         # Otherwise, add the song to queue
         elif not override:
-            await player.queue.put_wait(query)
+            await player.queue.put_wait(query[0])
             await ctx.response.send_message(respond.add_song_to_queue())
 
             # Remove any player buttons from the previous message
@@ -107,18 +105,18 @@ class Music(commands.Cog):
             # Prepares an embed message
             embed: Embed = Embed(
                 title="Song added to queue!",
-                description=query.title,
+                description=query[0].title,
                 color=Color.random()
             )
             embed.add_field(
                 name="Author:",
-                value=query.author
+                value=query[0].author
             )
             embed.add_field(
                 name="Duration:",
-                value=Music.convert_duration(query.duration)
+                value=Music.convert_duration(query[0].length)
             )
-            embed.set_thumbnail(f"https://img.youtube.com/vi/{query.identifier}/default.jpg")
+            embed.set_thumbnail(url=f"https://img.youtube.com/vi/{query[0].identifier}/default.jpg")
 
             # Attach player buttons to this new message
             # buttons: View = self.__render_player_buttons(player)
@@ -167,14 +165,14 @@ class Music(commands.Cog):
 
         try:
             # If the queue is not empty
-            if player.is_playing():
+            if player.playing:
 
                 # Have Cosette say something first
                 # await ctx.response.send_message(respond.show_queue())
 
                 # Setup an embed message
                 embed: Embed = Embed(title="Current Playlist", color=Color.random())
-                embed.set_thumbnail(f"https://img.youtube.com/vi/{player.current.identifier}/default.jpg")
+                embed.set_thumbnail(url=f"https://img.youtube.com/vi/{player.current.identifier}/default.jpg")
 
                 # Include the song that is currently playing to the embed message
                 embed.add_field(
@@ -279,7 +277,7 @@ class Music(commands.Cog):
 
         try:
             # If Cosette is currently playing a song
-            if not player.is_paused():
+            if not player.paused:
 
                 # Remove any player buttons from the previous message
                 await self.__remove_player_buttons(player)
@@ -319,7 +317,7 @@ class Music(commands.Cog):
 
         try:
             # If the current song is indeed being paused
-            if player.is_paused():
+            if player.paused:
 
                 # Remove any player buttons from the previous message
                 await self.__remove_player_buttons(player)
@@ -431,7 +429,7 @@ class Music(commands.Cog):
 
     def __render_embed(self, header: str, player: wavelink.Player) -> Embed:
 
-        track: wavelink.Track = player.current
+        track: wavelink.Playable = player.current
 
         # Prepares an embed message
         embed: Embed = Embed(
@@ -445,7 +443,7 @@ class Music(commands.Cog):
         )
         embed.add_field(
             name="Duration:",
-            value=Music.convert_duration(track.duration)
+            value=Music.convert_duration(track.length)
         )
         embed.add_field(
             name="Loop mode:",
@@ -455,14 +453,14 @@ class Music(commands.Cog):
             name="Shuffle mode:",
             value="`To be added soon!`"    # f"`{api.shuffle_mode.get(player.guild.id)}`"
         )
-        embed.set_thumbnail(f"https://img.youtube.com/vi/{track.identifier}/default.jpg")
+        embed.set_thumbnail(url=f"https://img.youtube.com/vi/{track.identifier}/default.jpg")
 
         # If there is a song in the queue, display the next song title
         try:
             if not player.queue.is_empty:
                 embed.add_field(
                     name="Next:",
-                    value=f"{player.queue[0].title} ({ Music.convert_duration(player.queue[0].duration) })",
+                    value=f"{player.queue[0].title} ({ Music.convert_duration(player.queue[0].length) })",
                     inline=False
                 )
 
@@ -474,11 +472,11 @@ class Music(commands.Cog):
     def __render_player_buttons(self, player: wavelink.Player) -> View:
 
         # Creates the view for the buttons
-        player_buttons_view = View(timeout=player.current.duration / 1000)
+        player_buttons_view = View(timeout=player.current.length / 1000)
         # player_buttons_view.on_timeout = lambda: self.__remove_player_buttons(player)
 
         # Pause button
-        if not player.is_paused():
+        if not player.paused:
             pause_button = Button(
                 style=ButtonStyle.blurple,
                 label="Pause",

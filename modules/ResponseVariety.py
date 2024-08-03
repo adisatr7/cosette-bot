@@ -2,6 +2,26 @@ import constants.responses as responses
 from random import randint
 
 
+def __random_response(responses_list: list[str]) -> str:
+    """
+    Selects a random response from a list of responses.
+
+    Args:
+        responses_list (list[str]): List of responses.
+
+    Returns:
+        str: Randomly selected response.
+    """
+    # Select a random index from the list of responses
+    random_index = randint(0, len(responses_list) - 1)
+
+    # Select the response at the random index
+    selected_response = responses_list[random_index]
+
+    # Return the selected response
+    return selected_response
+
+
 def come_online() -> str:
     """
     Selects a random greeting to be printed when Cosette comes online.
@@ -9,14 +29,7 @@ def come_online() -> str:
     Returns:
         str: Randomly selected greeting.
     """
-
-    # Select a random index within the range of greetings list
-    random_index = randint(0, len(responses.STARTUP) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_greeting = responses.STARTUP[random_index]
-
-    return selected_greeting
+    return __random_response(responses.STARTUP)
 
 
 def greet() -> str:
@@ -26,14 +39,7 @@ def greet() -> str:
     Returns:
         str: Randomly selected greeting.
     """
-
-    # Select a random index within the range of greetings list
-    random_index = randint(0, len(responses.GREETINGS) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_greeting = responses.GREETINGS[random_index]
-
-    return selected_greeting
+    return __random_response(responses.GREETINGS)
 
 
 def respond_to_mention() -> str:
@@ -43,14 +49,7 @@ def respond_to_mention() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.MENTIONED) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.MENTIONED[random_index]
-
-    return selected_response
+    return __random_response(responses.MENTIONED)
 
 
 def starts_playing_a_song() -> str:
@@ -61,14 +60,7 @@ def starts_playing_a_song() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.NEW_SONG) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.NEW_SONG[random_index]
-
-    return selected_response
+    return __random_response(responses.NEW_SONG)
 
 
 def add_song_to_queue() -> str:
@@ -79,14 +71,7 @@ def add_song_to_queue() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.ADD_TO_QUEUE) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.ADD_TO_QUEUE[random_index]
-
-    return selected_response
+    return __random_response(responses.ADD_TO_QUEUE)
 
 
 def user_not_in_voice_channel() -> str:
@@ -97,14 +82,7 @@ def user_not_in_voice_channel() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.USER_NOT_IN_VOICE_CHANNEL) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.USER_NOT_IN_VOICE_CHANNEL[random_index]
-
-    return selected_response
+    return __random_response(responses.USER_NOT_IN_VOICE_CHANNEL)
 
 
 def no_song_playing() -> str:
@@ -116,14 +94,7 @@ def no_song_playing() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.NO_SONG) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.NO_SONG[random_index]
-
-    return selected_response
+    return __random_response(responses.NO_SONG)
 
 
 def skip_song() -> str:
@@ -134,14 +105,7 @@ def skip_song() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.SKIPPING_SONGS) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.SKIPPING_SONGS[random_index]
-
-    return selected_response
+    return __random_response(responses.SKIPPING_SONGS)
 
 
 def no_more_songs() -> str:
@@ -152,14 +116,7 @@ def no_more_songs() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.NO_MORE_SONGS) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.NO_MORE_SONGS[random_index]
-
-    return selected_response
+    return __random_response(responses.NO_MORE_SONGS)
 
 
 def pause() -> str:
@@ -170,14 +127,7 @@ def pause() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.PAUSING) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.PAUSING[random_index]
-
-    return selected_response
+    return __random_response(responses.PAUSING)
 
 
 def song_already_paused() -> str:
@@ -188,14 +138,7 @@ def song_already_paused() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.SONG_ALREADY_PAUSED) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.SONG_ALREADY_PAUSED[random_index]
-
-    return selected_response
+    return __random_response(responses.SONG_ALREADY_PAUSED)
 
 
 def resume_song() -> str:
@@ -206,14 +149,7 @@ def resume_song() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.RESUMING_SONG) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.RESUMING_SONG[random_index]
-
-    return selected_response
+    return __random_response(responses.RESUMING_SONG)
 
 
 def song_already_resumed() -> str:
@@ -224,14 +160,7 @@ def song_already_resumed() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.SONG_ALREADY_RESUMED) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.SONG_ALREADY_RESUMED[random_index]
-
-    return selected_response
+    return __random_response(responses.SONG_ALREADY_RESUMED)
 
 
 def leave_vc_mid_performance() -> str:
@@ -243,14 +172,7 @@ def leave_vc_mid_performance() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.LEAVING_VC_MID_PERFORMANCE) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.LEAVING_VC_MID_PERFORMANCE[random_index]
-
-    return selected_response
+    return __random_response(responses.LEAVING_VC_MID_PERFORMANCE)
 
 
 def leave_vc_no_users() -> str:
@@ -263,18 +185,10 @@ def leave_vc_no_users() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(
-        0, len(responses.LEAVING_VC_NO_USERS_LEFT) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.LEAVING_VC_NO_USERS_LEFT[random_index]
-
-    return selected_response
+    return __random_response(responses.LEAVING_VC_NO_USERS_LEFT)
 
 
-def already_stopped():
+def already_stopped() -> str:
     """
     Selects a random response from a list for when the
     user calls for /stop command but Cosette is not even
@@ -283,14 +197,7 @@ def already_stopped():
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.ALREADY_STOPPED) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.ALREADY_STOPPED[random_index]
-
-    return selected_response
+    return __random_response(responses.ALREADY_STOPPED)
 
 
 def queue_is_empty() -> str:
@@ -301,14 +208,7 @@ def queue_is_empty() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.QUEUE_IS_EMPTY) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.QUEUE_IS_EMPTY[random_index]
-
-    return selected_response
+    return __random_response(responses.QUEUE_IS_EMPTY)
 
 
 def rolling_dice() -> str:
@@ -319,14 +219,7 @@ def rolling_dice() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.ROLLING) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.ROLLING[random_index]
-
-    return selected_response
+    return __random_response(responses.ROLLING)
 
 
 def get_rick_rolled() -> str:
@@ -337,14 +230,7 @@ def get_rick_rolled() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.RICK_ROLLED) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.RICK_ROLLED[random_index]
-
-    return selected_response
+    return __random_response(responses.RICK_ROLLED)
 
 
 def move_to_different_vc() -> str:
@@ -356,14 +242,8 @@ def move_to_different_vc() -> str:
     Returns:
         str: Randomly selected response.
     """
+    return __random_response(responses.MOVING_TO_DIFFERENT_VC)
 
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.MOVING_TO_DIFFERENT_VC) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.MOVING_TO_DIFFERENT_VC[random_index]
-
-    return selected_response
 
 def final_song_over() -> str:
     """
@@ -374,11 +254,4 @@ def final_song_over() -> str:
     Returns:
         str: Randomly selected response.
     """
-
-    # Select a random index within the range of responses list
-    random_index = randint(0, len(responses.FINAL_SONG_OVER) - 1)
-
-    # Retrieve the greeting at the random index
-    selected_response = responses.FINAL_SONG_OVER[random_index]
-
-    return selected_response
+    return __random_response(responses.FINAL_SONG_OVER)
