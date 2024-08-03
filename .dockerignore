@@ -1,0 +1,27 @@
+# Ignore compiled Python files
+*.pyc
+__pycache__/
+
+# Ignore the virtual environment directory
+.venv/
+
+# Ignore user-specific IDE and editor files
+.vscode/
+.idea/
+
+# Ignore log files
+*.log
+
+# Ignore Pylint configuration file
+.pylintrc
+
+# Ignore .venv directory
+.venv/
+
+# Ignore generated documentation
+docs/
+
+# Ignore miscellaneous temporary files
+*.tmp
+*.bak
+*.off
