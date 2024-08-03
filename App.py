@@ -1,17 +1,17 @@
 # Import necessary libraries
-import nextcord
+import discord
 import modules.ResponseVariety as respond
 import wavelink
 import os
 from dotenv import load_dotenv
-from nextcord.ext import commands
+from discord.ext import commands
 from constants.prefixes import COMMAND_PREFIXES
 from modules.Music import Music
 from modules.DiceRoll import DiceRoll
 
 
 # Declare Cosette's permissions
-intents = nextcord.Intents.default()
+intents = discord.Intents.default()
 intents.message_content = True
 intents.presences = True
 
@@ -32,7 +32,7 @@ async def on_node():
         uri=str(os.getenv("WAVELINK_URI")),
         password=str(os.getenv("WAVELINK_PASSWORD"))
     )
-    await wavelink.NodePool.connect(client=bot, nodes=[node])
+    await wavelink.Pool.connect(client=bot, nodes=[node])
     wavelink.Player.autoplay = True
 
 
@@ -41,9 +41,9 @@ async def on_node():
 async def on_ready() -> None:
 
     # Declare Cosette's activity status
-    activity = nextcord.Activity(
+    activity = discord.Activity(
         name="to you",
-        type=nextcord.ActivityType.listening
+        type=discord.ActivityType.listening
     )
 
     # Actually change the activity status
@@ -58,7 +58,7 @@ async def on_ready() -> None:
 
 # When the Cosette receives a message in any channels she's in
 @bot.event
-async def on_message(message: nextcord.Message or None) -> None:
+async def on_message(message: discord.Message or None) -> None:
 
     # If Cosette is mentioned without further context, have her respond randomly
     if bot.user.mentioned_in(message):
