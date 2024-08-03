@@ -1,6 +1,6 @@
 from firebase_admin.firestore import DELETE_FIELD
 from api.firestore import db
-from wavelink import YouTubeTrack, Queue
+from wavelink import TrackSource, Queue
 
 
 class QueueController:
@@ -18,7 +18,7 @@ class QueueController:
 
         for doc in docs:
             data = doc.to_dict()
-            song = YouTubeTrack(data)
+            song = TrackSource(data)
             queue.put(song)
 
         return queue
@@ -61,12 +61,12 @@ class QueueController:
         # except Exception as e:
         #     print(f"Failed to clear queue for guild {guild_id}!")
 
-    # def find(self, guild_id: int, position: int) -> YouTubeTrack:
+    # def find(self, guild_id: int, position: int) -> TrackSource:
     #     """
     #     Fetches song from the guild's queue playlist.
 
     #     Returns:
-    #         YouTubeTrack: Song object
+    #         TrackSource: Song object
     #     """
     #     try:
     #         print(f"Fetching song for guild {guild_id}...")
@@ -74,7 +74,7 @@ class QueueController:
 
     #         # If the document exists, deserialize it
     #         song_data: dict = docs.to_dict()
-    #         song_object: YouTubeTrack = YouTubeTrack(data=song_data)
+    #         song_object: TrackSource = TrackSource(data=song_data)
 
     #         return song_object
 
@@ -86,7 +86,7 @@ class QueueController:
 
     #         return ""
 
-    # def add(self, guild_id: int, song_object: YouTubeTrack) -> None:
+    # def add(self, guild_id: int, song_object: TrackSource) -> None:
     #     """
     #     Adds a song to the last position in the guild's queue playlist.
 

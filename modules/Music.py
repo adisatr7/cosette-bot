@@ -1,10 +1,8 @@
-from cProfile import label
-from discord import ChannelType, Member
-from nextcord import ButtonStyle, Color, Embed, Interaction, Message, TextChannel, SlashOption, SelectOption
-from nextcord.errors import ApplicationInvokeError
-from nextcord.ui import Button, Select, View
-from nextcord.ext import commands
-import nextcord
+from discord import Member, ButtonStyle, Color, Embed, ApplicationContext, Message, TextChannel, SelectOption, Option
+from discord.errors import ApplicationCommandInvokeError
+from discord.ui import Button, Select, View
+from discord.ext import commands
+import discord
 import wavelink
 import modules.ResponseVariety as respond
 import api.controllers as api
@@ -15,62 +13,70 @@ class Music(commands.Cog):
         self.bot: commands.Bot = bot
         print("Music cog loaded successfully!")
 
-    # Play command | TODO: Add Spotify support
-    @nextcord.slash_command(guild_ids=[], description="Summon Cosette and let her work her magic with a YouTube jam")
+    # Play music command | TODO: Add Spotify support
+    @discord.slash_command(name="play", description="Summon Cosette and let her work her magic with a YouTube jam")
     async def play(
         self,
-        interaction: Interaction,
-        search: str = SlashOption(
-            description="Enter the search query or YouTube URL of the song you want to play"),
-        override: bool | None = SlashOption(
-            description="Play the new song immediately, replacing the one currently playing (optional)")
+        ctx: ApplicationContext,
+        search_keyword: str = Option(
+            str,
+            description="Enter the search query or YouTube URL of the song you want to play",
+            required=True
+        ),
+        override: bool = Option(
+            bool,
+            description="Play the new song immediately, replacing the one currently playing (optional)",
+            required=False,
+            default=False)
     ) -> None:
-        print(f"User {interaction.user.display_name} of guild ID {interaction.guild_id} called /play from channel ID {interaction.channel_id}")
+
+        # Debugging purposes
+        print(f"User {ctx.user.display_name} of guild ID {ctx.guild_id} called /play from channel ID {ctx.channel_id}")
 
         # Remembers which text channel the command is executed from
-        api.active_channel.set(interaction.guild_id, interaction.channel_id)
+        api.active_channel.set(ctx.guild_id, ctx.channel_id)
 
         # Do a YouTube search
-        query = await wavelink.YouTubeTrack.search(search, return_first=True)
+        query = await wavelink.Playable.search(search_keyword)
         print(f"Searching for song {query.title} with ID {query.identifier}")
 
         # Set the target voice channel where the user is in
         try:
-            destination = interaction.user.voice.channel
+            destination = ctx.user.voice.channel
 
         # Exception handler: If the user is not in a voice channel
         # TODO: Test what happens if the user is in a voice channel that she has no permission to join
         except AttributeError as e:
 
             # Have Cosette respond to them via chat
-            await interaction.response.send_message(respond.user_not_in_voice_channel())
+            await ctx.response.send_message(respond.user_not_in_voice_channel())
 
             # End the function early
             return
 
         # If Cosette is not already in the voice channel, have her join one now
-        if not interaction.guild.voice_client:
+        if not ctx.guild.voice_client:
             player: wavelink.Player = await destination.connect(cls=wavelink.Player)
 
         # If the user is in another channel, have Cosette move there
-        elif interaction.guild.voice_client.channel != destination:
-            player: wavelink.Player = await interaction.guild.voice_client.move_to(destination)
-            await interaction.response.send_message(respond.move_to_different_vc())
+        elif ctx.guild.voice_client.channel != destination:
+            player: wavelink.Player = await ctx.guild.voice_client.move_to(destination)
+            await ctx.response.send_message(respond.move_to_different_vc())
 
         # Otherwise, stay there
         else:
-            player: wavelink.Player = interaction.guild.voice_client
+            player: wavelink.Player = ctx.guild.voice_client
 
         # If the queue is empty and the player is not playing, have Cosette play the song now
         if override or not player.is_playing():
             await player.play(query)
             if player.is_paused():
                 await player.pause()
-            msg: Message = await interaction.response.send_message(respond.starts_playing_a_song())
+            msg: Message = await ctx.response.send_message(respond.starts_playing_a_song())
 
             # Remembers where active channel is
-            guild_id = interaction.guild_id
-            channel_id = interaction.channel_id
+            guild_id = ctx.guild_id
+            channel_id = ctx.channel_id
             api.active_channel.set(guild_id, channel_id)
 
             # Remove any player buttons from the previous message
@@ -80,7 +86,7 @@ class Music(commands.Cog):
         # Otherwise, add the song to queue
         elif not override:
             await player.queue.put_wait(query)
-            await interaction.response.send_message(respond.add_song_to_queue())
+            await ctx.response.send_message(respond.add_song_to_queue())
 
             # Remove any player buttons from the previous message
             # await self.__remove_player_buttons(player)
@@ -90,7 +96,7 @@ class Music(commands.Cog):
             buttons: View = self.__render_player_buttons(player)
 
             # Get the ID of the message where the buttons are attached to
-            msg_id, ch_id = api.message_buttons.get(interaction.guild_id)
+            msg_id, ch_id = api.message_buttons.get(ctx.guild_id)
             ch = self.bot.get_channel(ch_id)
             msg = await ch.fetch_message(msg_id)
 
@@ -118,53 +124,53 @@ class Music(commands.Cog):
             # buttons: View = self.__render_player_buttons(player)
 
             # Sends the embed message
-            await interaction.channel.send(embed=embed)
+            await ctx.channel.send(embed=embed)
 
         # EXPERIMENTAL
-        # api.queue_controller.set(interaction.guild_id, player.queue)
-        # api.queue_controller.clear(interaction.guild_id)
-        # debug: wavelink.Queue = api.queue_controller.get(interaction.guild_id)
+        # api.queue_controller.set(ctx.guild_id, player.queue)
+        # api.queue_controller.clear(ctx.guild_id)
+        # debug: wavelink.Queue = api.queue_controller.get(ctx.guild_id)
         # print(f"DEBUG: Real queue output test: {player.queue}")
         # print(f"DEBUG: Firestore queue test: {debug}")
 
     # Skip command
-    @nextcord.slash_command(guild_ids=[], description="Have Cosette to cue up the next melody in line.")
-    async def skip(self, interaction: Interaction) -> None:
-        print(f"User {interaction.user.display_name} of guild ID {interaction.guild_id} called /skip from channel ID {interaction.channel_id}")
-        await self.__skip_callback(interaction, True)
+    @discord.slash_command(name="skip", description="Have Cosette to cue up the next melody in line.")
+    async def skip(self, ctx: ApplicationContext) -> None:
+        print(f"User {ctx.user.display_name} of guild ID {ctx.guild_id} called /skip from channel ID {ctx.channel_id}")
+        await self.__skip_callback(ctx, True)
 
     # Pause command
-    @nextcord.slash_command(guild_ids=[], description="Give Cosette a breather - even music bots need a quick break.")
-    async def pause(self, interaction: Interaction) -> None:
-        print(f"User {interaction.user.display_name} of guild ID {interaction.guild_id} called /pause from channel ID {interaction.channel_id}")
-        await self.__pause_callback(interaction, True)
+    @discord.slash_command(name="pause", description="Give Cosette a breather - even music bots need a quick break.")
+    async def pause(self, ctx: ApplicationContext) -> None:
+        print(f"User {ctx.user.display_name} of guild ID {ctx.guild_id} called /pause from channel ID {ctx.channel_id}")
+        await self.__pause_callback(ctx, True)
 
     # Resume command
-    @nextcord.slash_command(guild_ids=[], description="Get the music flowing again! Cosette's tunes can't stay quiet for long.")
-    async def resume(self, interaction: Interaction) -> None:
-        print(f"User {interaction.user.display_name} of guild ID {interaction.guild_id} called /resume from channel ID {interaction.channel_id}")
-        await self.__resume_callback(interaction, True)
+    @discord.slash_command(name="resume", description="Get the music flowing again! Cosette's tunes can't stay quiet for long.")
+    async def resume(self, ctx: ApplicationContext) -> None:
+        print(f"User {ctx.user.display_name} of guild ID {ctx.guild_id} called /resume from channel ID {ctx.channel_id}")
+        await self.__resume_callback(ctx, True)
 
     # Stop command
-    @nextcord.slash_command(guild_ids=[], description="Hush Cosette's melodious purrs, leaving her song unfinished.")
-    async def stop(self, interaction: Interaction) -> None:
-        print(f"User {interaction.user.display_name} of guild ID {interaction.guild_id} called /stop from channel ID {interaction.channel_id}")
-        await self.__stop_callback(interaction, True)
+    @discord.slash_command(name="stop", description="Hush Cosette's melodious purrs, leaving her song unfinished.")
+    async def stop(self, ctx: ApplicationContext) -> None:
+        print(f"User {ctx.user.display_name} of guild ID {ctx.guild_id} called /stop from channel ID {ctx.channel_id}")
+        await self.__stop_callback(ctx, True)
 
     # See queue command
-    @nextcord.slash_command(guild_ids=[], description="Peek into Cosette's song queue.")
-    async def queue(self, interaction: Interaction) -> None:
-        print(f"User {interaction.user.display_name} of guild ID {interaction.guild_id} called /queue from channel ID {interaction.channel_id}")
+    @discord.slash_command(name="queue", description="Peek into Cosette's song queue.")
+    async def queue(self, ctx: ApplicationContext) -> None:
+        print(f"User {ctx.user.display_name} of guild ID {ctx.guild_id} called /queue from channel ID {ctx.channel_id}")
 
         # Initializes Wavelink Player
-        player: wavelink.Player = interaction.guild.voice_client
+        player: wavelink.Player = ctx.guild.voice_client
 
         try:
             # If the queue is not empty
             if player.is_playing():
 
                 # Have Cosette say something first
-                # await interaction.response.send_message(respond.show_queue())
+                # await ctx.response.send_message(respond.show_queue())
 
                 # Setup an embed message
                 embed: Embed = Embed(title="Current Playlist", color=Color.random())
@@ -224,27 +230,27 @@ class Music(commands.Cog):
                 buttons = self.__render_player_buttons(player)
 
                 # Send the embed message containing queue data to the user
-                await interaction.response.send_message(embed=embed, view=buttons)
+                await ctx.response.send_message(embed=embed, view=buttons)
 
             # If the queue is empty
             else:
 
                 # Have Cosette tells the user that the queue is indeed empty
-                await interaction.response.send_message(respond.queue_is_empty())
+                await ctx.response.send_message(respond.queue_is_empty())
 
         # Exception handler: If the 'queue' object is not initialized
         except AttributeError as e:
 
             # Have Cosette tells the user that she's not playing anything at the moment
-            await interaction.response.send_message(respond.queue_is_empty())
+            await ctx.response.send_message(respond.queue_is_empty())
 
     # Automatically have Cosette do something when a song is over
     # @commands.Cog.listener()
-    # async def on_wavelink_track_end(self, payload: wavelink.TrackEventPayload) -> None:
+    # async def on_wavelink_track_end(self, payload: wavelink.Playable) -> None:
 
     # Automatically tells the name of the current song that is playing
     @commands.Cog.listener()
-    async def on_wavelink_track_start(self, payload: wavelink.TrackEventPayload) -> None:
+    async def on_wavelink_track_start(self, payload: wavelink.Playable) -> None:
 
         player: wavelink.Player = payload.player
 
@@ -265,11 +271,11 @@ class Music(commands.Cog):
         # Remembers where the last message with buttons is
         api.message_buttons.set(player.guild.id, msg.id)
 
-    async def __pause_callback(self, interaction: Interaction, reaction: bool = False) -> None:
+    async def __pause_callback(self, ctx: ApplicationContext, reaction: bool = False) -> None:
         """Pauses the current song."""
 
         # Initializes Wavelink Player
-        player: wavelink.Player = interaction.guild.voice_client
+        player: wavelink.Player = ctx.guild.voice_client
 
         try:
             # If Cosette is currently playing a song
@@ -283,7 +289,7 @@ class Music(commands.Cog):
 
                 # Have her tell the user that the song is paused
                 # if reaction:
-                await interaction.response.send_message(respond.pause())
+                await ctx.response.send_message(respond.pause())
 
                 # Prepares an embed message
                 embed: Embed = self.__render_embed(header="Song paused!", player=player)
@@ -292,24 +298,24 @@ class Music(commands.Cog):
                 buttons: View = self.__render_player_buttons(player)
 
                 # Sends the embed message
-                channel = self.bot.get_channel(api.active_channel.get(interaction.guild_id))
+                channel = self.bot.get_channel(api.active_channel.get(ctx.guild_id))
                 msg = await channel.send(embed=embed, view=buttons)
 
                 # Remembers where the last message with buttons is
-                api.message_buttons.set(interaction.guild_id, msg.id)
+                api.message_buttons.set(ctx.guild_id, msg.id)
 
             # Otherwise, have her tell the user that she's not playing anything
             else:
-                await interaction.response.send_message(respond.song_already_paused())
+                await ctx.response.send_message(respond.song_already_paused())
 
         # Exception handler: When the bot is not in a voice channel
         except Exception as e:
-            await interaction.response.send_message(respond.no_song_playing())
+            await ctx.response.send_message(respond.no_song_playing())
 
-    async def __resume_callback(self, interaction: Interaction, reaction: bool = False) -> None:
+    async def __resume_callback(self, ctx: ApplicationContext, reaction: bool = False) -> None:
 
         # Initializes Wavelink Player
-        player: wavelink.Player = interaction.guild.voice_client
+        player: wavelink.Player = ctx.guild.voice_client
 
         try:
             # If the current song is indeed being paused
@@ -323,7 +329,7 @@ class Music(commands.Cog):
 
                 # Have her tell the user that the song is already playing
                 # if reaction:
-                await interaction.response.send_message(respond.resume_song())
+                await ctx.response.send_message(respond.resume_song())
 
                 # Prepares an embed message
                 embed: Embed = self.__render_embed(header="Song resumed!", player=player)
@@ -332,28 +338,28 @@ class Music(commands.Cog):
                 buttons = self.__render_player_buttons(player)
 
                 # Sends the embed message
-                channel_id: int = api.active_channel.get(interaction.guild_id)
+                channel_id: int = api.active_channel.get(ctx.guild_id)
                 channel = self.bot.get_channel(channel_id)
                 msg = await channel.send(embed=embed, view=buttons)
 
                 # Remembers where the last message with buttons is
-                api.message_buttons.set(interaction.guild_id, msg.id)
+                api.message_buttons.set(ctx.guild_id, msg.id)
 
             # Otherwise, have her tell the user that the song is already resumed
             else:
                 print("Song is already resumed!")
-                await interaction.response.send_message(respond.song_already_resumed())
+                await ctx.response.send_message(respond.song_already_resumed())
 
         # Exception handler: When the bot is not in a voice channel
         except Exception as e:
             print("Failed: There is no song to begin with!")
-            await interaction.response.send_message(respond.no_song_playing())
+            await ctx.response.send_message(respond.no_song_playing())
 
-    async def __stop_callback(self, interaction: Interaction, reaction: bool = False) -> None:
+    async def __stop_callback(self, ctx: ApplicationContext, reaction: bool = False) -> None:
         """Stops the current song and clears the queue."""
 
         # Initializes Wavelink Player
-        player: wavelink.Player = interaction.guild.voice_client
+        player: wavelink.Player = ctx.guild.voice_client
 
         try:
             # Remove any player buttons from the previous message
@@ -363,17 +369,17 @@ class Music(commands.Cog):
             await player.disconnect()
 
             # Have Cosette tells the user a message as she leaves the voice channel
-            vc_members: list[Member] = interaction.user.voice.channel.members
+            vc_members: list[Member] = ctx.user.voice.channel.members
 
             # If there are more than 1 users in the voice channel
             if len(vc_members) > 1:
                 # Have Cosette expresses disappointment, sadness, or annoyance
-                await interaction.response.send_message(respond.leave_vc_mid_performance())
+                await ctx.response.send_message(respond.leave_vc_mid_performance())
 
             # If she's the only one left in the voice channel
             else:
                 # Have Cosette thanks the user for having her
-                await interaction.response.send_message(respond.leave_vc_no_users())
+                await ctx.response.send_message(respond.leave_vc_no_users())
 
             # Have Cosette clears the music player queue
             # if not player.queue.is_empty:
@@ -387,22 +393,22 @@ class Music(commands.Cog):
             )
 
             # Sends the embed message
-            channel_id: int = api.active_channel.get(interaction.guild_id)
+            channel_id: int = api.active_channel.get(ctx.guild_id)
             channel: TextChannel = self.bot.get_channel(channel_id)
             msg: TextChannel = await channel.send(embed=embed)
 
             # Remembers where the last message with buttons is
-            api.message_buttons.set(interaction.guild_id, msg.id)
+            api.message_buttons.set(ctx.guild_id, msg.id)
 
         # Exception handling: If Cosette is not even in a voice channel
-        except ApplicationInvokeError as e:
-            await interaction.response.send_message(respond.already_stopped())
+        except ApplicationCommandInvokeError as e:
+            await ctx.response.send_message(respond.already_stopped())
 
-    async def __skip_callback(self, interaction: Interaction, reaction: bool = False) -> None:
+    async def __skip_callback(self, ctx: ApplicationContext, reaction: bool = False) -> None:
         """Skips the current song and plays the next one in queue."""
 
         # Initializes Wavelink Player
-        player: wavelink.Player = interaction.guild.voice_client
+        player: wavelink.Player = ctx.guild.voice_client
 
         # Have Cosette stop the current song. The whole thing is set so that
         # it automatically plays the next song if the current one is stopped
@@ -412,16 +418,16 @@ class Music(commands.Cog):
                 await player.stop()
 
                 # if reaction:
-                await interaction.response.send_message(respond.skip_song())
+                await ctx.response.send_message(respond.skip_song())
 
             # If there are no more songs in the queue
             else:
-                await interaction.response.send_message(respond.no_more_songs())
+                await ctx.response.send_message(respond.no_more_songs())
 
         # Exception handling: If the 'queue' object is not initialized
         # Presumed cause: there are no more songs in the queue
-        except ApplicationInvokeError and AttributeError as e:
-            await interaction.response.send_message(respond.no_more_songs())
+        except ApplicationCommandInvokeError and AttributeError as e:
+            await ctx.response.send_message(respond.no_more_songs())
 
     def __render_embed(self, header: str, player: wavelink.Player) -> Embed:
 
@@ -468,7 +474,7 @@ class Music(commands.Cog):
     def __render_player_buttons(self, player: wavelink.Player) -> View:
 
         # Creates the view for the buttons
-        player_buttons_view = nextcord.ui.View(timeout=player.current.duration / 1000)
+        player_buttons_view = View(timeout=player.current.duration / 1000)
         # player_buttons_view.on_timeout = lambda: self.__remove_player_buttons(player)
 
         # Pause button
@@ -520,7 +526,7 @@ class Music(commands.Cog):
             min_values=1,
             max_values=1
         )
-        loop_settings.callback = lambda interaction: self.__loop_settings_callback(interaction, loop_settings)
+        loop_settings.callback = lambda ctx: self.__loop_settings_callback(ctx, loop_settings)
         player_buttons_view.add_item(loop_settings)
 
         # TODO: Loop button, jump button, shuffle button
@@ -547,11 +553,11 @@ class Music(commands.Cog):
             # Clear the message ID from Firestore
             api.message_buttons.clear(player.guild.id)
 
-    async def __loop_settings_callback(self, interaction: Interaction, dropdown: Select) -> None:
+    async def __loop_settings_callback(self, ctx: ApplicationContext, dropdown: Select) -> None:
         """Handles the loop settings."""
 
         # Initializes Wavelink Player
-        player: wavelink.Player = interaction.guild.voice_client
+        player: wavelink.Player = ctx.guild.voice_client
 
         # If the user selects "off"
         if dropdown.values[0] == "off":
@@ -576,7 +582,7 @@ class Music(commands.Cog):
 
         embed = self.__render_embed("Now playing:", player)
         buttons = self.__render_player_buttons(player)
-        await interaction.message.edit(embed=embed, view=buttons)
+        await ctx.message.edit(embed=embed, view=buttons)
 
     # Converts milliseconds to a time string that is human-readable
     @staticmethod
